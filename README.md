@@ -2,7 +2,9 @@
 
 # DGPPO
 
-Jax official implementation of DGPPO (Discrete GCBF Proximal Policy Optimization)
+[![Conference](https://img.shields.io/badge/ICLR-Accepted-success)](https://mit-realm.github.io/gcbf-website/)
+
+Jax official implementation of ICLR2025 paper: [Songyuan Zhang](https://syzhang092218-source.github.io), [Oswin So](https://oswinso.xyz/), [Mitchell Black](https://www.blackmitchell.com/), and [Chuchu Fan](https://chuchu.mit.edu): "[Discrete GCBF Proximal Policy Optimization for Multi-agent Safe Optimal Control](https://mit-realm.github.io/dgppo-website/)". 
 
 [Dependencies](#Dependencies) •
 [Installation](#Installation) •
