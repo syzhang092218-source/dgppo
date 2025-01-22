@@ -51,7 +51,7 @@ class Trainer:
                 os.mkdir(self.model_dir)
 
         wandb.login()
-        wandb.init(name=params['run_name'], project='cmarl', group=env.__class__.__name__, dir=self.log_dir)
+        wandb.init(name=params['run_name'], project='dgppo', group=env.__class__.__name__, dir=self.log_dir)
 
         self.save_log = save_log
 

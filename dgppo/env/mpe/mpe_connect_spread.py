@@ -4,11 +4,11 @@ import jax.random as jr
 from jax.lax import while_loop
 from typing import Optional, Tuple
 
-from cmarl.env.mpe.base import MPEEnvState, MPEEnvGraphsTuple
-from cmarl.env.utils import get_node_goal_rng
-from cmarl.utils.graph import EdgeBlock, GraphsTuple
-from cmarl.utils.typing import Array, Cost, State, PRNGKey
-from cmarl.env.mpe.mpe_spread import MPESpread
+from dgppo.env.mpe.base import MPEEnvState, MPEEnvGraphsTuple
+from dgppo.env.utils import get_node_goal_rng
+from dgppo.utils.graph import EdgeBlock, GraphsTuple
+from dgppo.utils.typing import Array, Cost, State, PRNGKey
+from dgppo.env.mpe.mpe_spread import MPESpread
 
 
 class MPEConnectSpread(MPESpread):

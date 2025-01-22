@@ -19,7 +19,7 @@ from ..trainer.data import Rollout
 from ..trainer.utils import centered_norm
 from ..utils.typing import EdgeIndex, Pos2d, Pos3d, Array
 from ..utils.utils import merge01, tree_index, MutablePatchCollection, save_anim
-from cmarl.env.obstacle import Cuboid, Sphere, Obstacle, Rectangle
+from dgppo.env.obstacle import Cuboid, Sphere, Obstacle, Rectangle
 
 
 def plot_graph(

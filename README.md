@@ -53,7 +53,7 @@ pip install -e .
 To train a model on the `LidarSpread` environment, run:
 
 ```bash
-python train.py --env LidarSpread --algo dgppo -n 3 --obs 3 --cbf-schedule
+python train.py --env LidarSpread --algo dgppo -n 3 --obs 3
 ```
 
 To evaluate a model, run:

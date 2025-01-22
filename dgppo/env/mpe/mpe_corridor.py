@@ -2,11 +2,11 @@ import jax.numpy as jnp
 
 from typing import Optional, Tuple
 
-from cmarl.env.mpe.base import MPEEnvState
-from cmarl.env.utils import get_node_goal_rng
-from cmarl.utils.graph import EdgeBlock, GraphsTuple
-from cmarl.utils.typing import Array, State
-from cmarl.env.mpe.mpe_spread import MPESpread
+from dgppo.env.mpe.base import MPEEnvState
+from dgppo.env.utils import get_node_goal_rng
+from dgppo.utils.graph import EdgeBlock, GraphsTuple
+from dgppo.utils.typing import Array, State
+from dgppo.env.mpe.mpe_spread import MPESpread
 
 
 class MPECorridor(MPESpread):

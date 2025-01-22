@@ -4,11 +4,11 @@ import jax
 
 from typing import Optional
 
-from cmarl.utils.graph import GraphsTuple
-from cmarl.utils.typing import Action, Array, Pos2d, Reward
-from cmarl.env.mpe.base import MPEEnvState, MPEEnvGraphsTuple
-from cmarl.env.utils import get_node_goal_rng
-from cmarl.env.mpe.mpe_spread import MPESpread
+from dgppo.utils.graph import GraphsTuple
+from dgppo.utils.typing import Action, Array, Pos2d, Reward
+from dgppo.env.mpe.base import MPEEnvState, MPEEnvGraphsTuple
+from dgppo.env.utils import get_node_goal_rng
+from dgppo.env.mpe.mpe_spread import MPESpread
 
 
 class MPELine(MPESpread):

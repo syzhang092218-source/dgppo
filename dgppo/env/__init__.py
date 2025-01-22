@@ -1,9 +1,9 @@
 from typing import Optional
 
 from .base import MultiAgentEnv
-from cmarl.env.mpe import MPETarget, MPESpread, MPELine, MPEFormation, MPECorridor, MPEConnectSpread
-from cmarl.env.lidar_env import LidarSpread, LidarTarget, LidarLine, LidarBicycleTarget
-from cmarl.env.vmas import VMASWheel, VMASReverseTransport
+from dgppo.env.mpe import MPETarget, MPESpread, MPELine, MPEFormation, MPECorridor, MPEConnectSpread
+from dgppo.env.lidar_env import LidarSpread, LidarTarget, LidarLine, LidarBicycleTarget
+from dgppo.env.vmas import VMASWheel, VMASReverseTransport
 
 
 ENV = {

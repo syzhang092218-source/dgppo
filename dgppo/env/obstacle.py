@@ -3,8 +3,8 @@ import jax.numpy as jnp
 
 from typing import NamedTuple, Protocol
 from jax.scipy.spatial.transform import Rotation
-from cmarl.utils.typing import Pos2d, Pos3d, Pos
-from cmarl.utils.typing import (Array, ObsType, ObsWidth, ObsHeight, ObsTheta,
+from dgppo.utils.typing import Pos2d, Pos3d, Pos
+from dgppo.utils.typing import (Array, ObsType, ObsWidth, ObsHeight, ObsTheta,
                                 Radius, ObsLength, ObsQuaternion, BoolScalar)
 
 RECTANGLE = jnp.zeros(1)

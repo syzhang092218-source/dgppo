@@ -10,7 +10,7 @@ from jax.lax import while_loop
 
 from ..utils.typing import Array, Radius, BoolScalar, Pos, State, Action, PRNGKey
 from ..utils.utils import merge01
-from cmarl.env.obstacle import Obstacle, Rectangle, Cuboid, Sphere
+from dgppo.env.obstacle import Obstacle, Rectangle, Cuboid, Sphere
 
 
 def RK4_step(x_dot_fn: Callable, x: State, u: Action, dt: float) -> Array:

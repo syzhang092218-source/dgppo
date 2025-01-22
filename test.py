@@ -11,12 +11,12 @@ import jax.random as jr
 import numpy as np
 import yaml
 
-from cmarl.algo import make_algo
-from cmarl.env import make_env
-from cmarl.trainer.utils import test_rollout
-from cmarl.utils.graph import GraphsTuple
-from cmarl.utils.utils import jax_jit_np, jax_vmap
-from cmarl.utils.typing import Array
+from dgppo.algo import make_algo
+from dgppo.env import make_env
+from dgppo.trainer.utils import test_rollout
+from dgppo.utils.graph import GraphsTuple
+from dgppo.utils.utils import jax_jit_np, jax_vmap
+from dgppo.utils.typing import Array
 
 
 def test(args):

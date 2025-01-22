@@ -14,9 +14,9 @@ from ...utils.graph import EdgeBlock, GetGraph, GraphsTuple
 from ...utils.typing import Action, Array, Cost, Done, Info, Pos2d, Reward, State, AgentState
 from ...utils.utils import merge01, jax_vmap
 from ..base import MultiAgentEnv
-from cmarl.env.obstacle import Obstacle, Rectangle
-from cmarl.env.plot import render_mpe
-from cmarl.env.utils import get_lidar, get_node_goal_rng
+from dgppo.env.obstacle import Obstacle, Rectangle
+from dgppo.env.plot import render_mpe
+from dgppo.env.utils import get_lidar, get_node_goal_rng
 
 
 class LidarEnvState(NamedTuple):

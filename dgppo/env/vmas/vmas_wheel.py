@@ -14,12 +14,12 @@ from matplotlib.patches import Wedge
 from .physax.entity import Agent, Entity
 from .physax.shapes import Line, Sphere
 from .physax.world import World
-from cmarl.trainer.data import Rollout
-from cmarl.utils.graph import EdgeBlock, GetGraph, GraphsTuple
-from cmarl.utils.typing import Action, Array, Cost, Done, FloatScalar, Info, Reward, State
-from cmarl.utils.utils import save_anim, tree_index
-from cmarl.env.base import MultiAgentEnv
-from cmarl.env.utils import get_node_goal_rng
+from dgppo.trainer.data import Rollout
+from dgppo.utils.graph import EdgeBlock, GetGraph, GraphsTuple
+from dgppo.utils.typing import Action, Array, Cost, Done, FloatScalar, Info, Reward, State
+from dgppo.utils.utils import save_anim, tree_index
+from dgppo.env.base import MultiAgentEnv
+from dgppo.env.utils import get_node_goal_rng
 
 
 class VMASWheelState(NamedTuple):

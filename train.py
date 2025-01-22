@@ -6,10 +6,10 @@ import numpy as np
 import wandb
 import yaml
 
-from cmarl.algo import make_algo
-from cmarl.env import make_env
-from cmarl.trainer.trainer import Trainer
-from cmarl.trainer.utils import is_connected
+from dgppo.algo import make_algo
+from dgppo.env import make_env
+from dgppo.trainer.trainer import Trainer
+from dgppo.trainer.utils import is_connected
 
 
 def train(args):

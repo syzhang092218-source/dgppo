@@ -6,12 +6,12 @@ import jax.random as jr
 from typing import NamedTuple, Tuple, Optional
 from abc import ABC, abstractmethod
 
-from cmarl.env.plot import render_mpe
-from cmarl.trainer.data import Rollout
-from cmarl.utils.graph import EdgeBlock, GetGraph, GraphsTuple
-from cmarl.utils.typing import Action, Array, Cost, Done, Info, Reward, State, AgentState
-from cmarl.env.base import MultiAgentEnv
-from cmarl.env.utils import get_node_goal_rng
+from dgppo.env.plot import render_mpe
+from dgppo.trainer.data import Rollout
+from dgppo.utils.graph import EdgeBlock, GetGraph, GraphsTuple
+from dgppo.utils.typing import Action, Array, Cost, Done, Info, Reward, State, AgentState
+from dgppo.env.base import MultiAgentEnv
+from dgppo.env.utils import get_node_goal_rng
 
 
 class MPEEnvState(NamedTuple):
