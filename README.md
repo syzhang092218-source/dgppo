@@ -2,7 +2,7 @@
 
 # DGPPO
 
-[![Conference](https://img.shields.io/badge/ICLR-Accepted-success)](https://mit-realm.github.io/dgppo-website/)
+[![Conference](https://img.shields.io/badge/ICLR-Accepted-success)](https://mit-realm.github.io/dgppo/)
 
 Jax official implementation of ICLR2025 paper: [Songyuan Zhang](https://syzhang092218-source.github.io), [Oswin So](https://oswinso.xyz/), [Mitchell Black](https://www.blackmitchell.com/), and [Chuchu Fan](https://chuchu.mit.edu): "[Discrete GCBF Proximal Policy Optimization for Multi-agent Safe Optimal Control](https://mit-realm.github.io/dgppo-website/)". 
 
@@ -212,3 +212,14 @@ This should report the reward, min/max reward, cost, min/max cost, and the safet
 - `--seed`: Random seed, default 1234.
 - `--debug`: Debug mode.
 - `--dpi`: DPI of the video, default 100.
+
+## Citation
+
+```
+@inproceedings{zhang2025dgppo,
+      title={Discrete GCBF Proximal Policy Optimization for Multi-agent Safe Optimal Control},
+      author={Zhang, Songyuan and So, Oswin and Black, Mitchell and Fan, Chuchu},
+      booktitle={The Thirteenth International Conference on Learning Representations},
+      year={2025},
+}
+```
