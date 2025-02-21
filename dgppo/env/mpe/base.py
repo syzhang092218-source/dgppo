@@ -200,9 +200,9 @@ class MPE(MultiAgentEnv, ABC):
             **kwargs
     ) -> None:
         render_mpe(rollout=rollout, video_path=video_path, side_length=self.area_size, dim=2, n_agent=self.num_agents,
-                   n_rays=self.params["top_k_rays"] if self.params["n_obs"] > 0 else 0,
-                   r=self.params["car_radius"], cost_components=self.cost_components,
-                   Ta_is_unsafe=Ta_is_unsafe, viz_opts=viz_opts, n_goal=self.num_goals,  dpi=dpi, **kwargs)
+                   n_obs=self.params['n_obs'], r=self.params["car_radius"], obs_r=self.params['obs_radius'],
+                   cost_components=self.cost_components, Ta_is_unsafe=Ta_is_unsafe, viz_opts=viz_opts,
+                   n_goal=self.num_goals, dpi=dpi, **kwargs)
 
     @abstractmethod
     def edge_blocks(self, state: MPEEnvState) -> list[EdgeBlock]:

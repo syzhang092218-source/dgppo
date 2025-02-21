@@ -15,7 +15,7 @@ from ...utils.typing import Action, Array, Cost, Done, Info, Pos2d, Reward, Stat
 from ...utils.utils import merge01, jax_vmap
 from ..base import MultiAgentEnv
 from dgppo.env.obstacle import Obstacle, Rectangle
-from dgppo.env.plot import render_mpe
+from dgppo.env.plot import render_lidar
 from dgppo.env.utils import get_lidar, get_node_goal_rng
 
 
@@ -215,10 +215,10 @@ class LidarEnv(MultiAgentEnv, ABC):
             dpi: int = 100,
             **kwargs
     ) -> None:
-        render_mpe(rollout=rollout, video_path=video_path, side_length=self.area_size, dim=2, n_agent=self.num_agents,
-                   n_rays=self.params["top_k_rays"] if self.params["n_obs"] > 0 else 0,
-                   r=self.params["car_radius"], cost_components=self.cost_components,
-                   Ta_is_unsafe=Ta_is_unsafe, viz_opts=viz_opts, n_goal=self.num_goals, dpi=dpi, **kwargs)
+        render_lidar(rollout=rollout, video_path=video_path, side_length=self.area_size, dim=2, n_agent=self.num_agents,
+                     n_rays=self.params["top_k_rays"] if self.params["n_obs"] > 0 else 0,
+                     r=self.params["car_radius"], cost_components=self.cost_components,
+                     Ta_is_unsafe=Ta_is_unsafe, viz_opts=viz_opts, n_goal=self.num_goals, dpi=dpi, **kwargs)
 
     @abstractmethod
     def edge_blocks(self, state: LidarEnvState, lidar_data: Optional[Pos2d] = None) -> list[EdgeBlock]:
