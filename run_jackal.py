@@ -4,6 +4,7 @@ import jax.random as jr
 import jax.numpy as jnp
 
 from geometry_msgs.msg import Twist
+from std_msgs.msg import Float32
 from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion
 
@@ -22,7 +23,7 @@ class JackalMover:
         self.odom_sub = rospy.Subscriber('/sparkal1/odom', Odometry, self.odom_callback)
 
         # Publisher of the current orientation
-        self.orientation_pub = rospy.Publisher('/sparkal1/jackal_orientation', float, queue_size=10)
+        self.orientation_pub = rospy.Publisher('/sparkal1/jackal_orientation', Float32, queue_size=10)
 
         # Initialize robot state
         self.position = [0.0, 0.0]  # (x, y)
