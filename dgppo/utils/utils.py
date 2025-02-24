@@ -30,11 +30,11 @@ _T = TypeVar("_T")
 _U = TypeVar("_U")
 
 
-def jax_vmap(fn, in_axes: int | Sequence[Any] = 0, out_axes: Any = 0):
+def jax_vmap(fn, in_axes: int, out_axes: Any = 0):
     return jax.vmap(fn, in_axes, out_axes)
 
 
-def rep_vmap(fn, rep: int, in_axes: int | Sequence[Any] = 0, **kwargs):
+def rep_vmap(fn, rep: int, in_axes: int, **kwargs):
     for ii in range(rep):
         fn = jax.vmap(fn, in_axes=in_axes, **kwargs)
     return fn
@@ -65,7 +65,7 @@ def tree_concat_at_front(tree1: _PyTree, tree2: _PyTree, axis: int) -> _PyTree:
     return jtu.tree_map(tree_concat_at_front_inner, tree1, tree2)
 
 
-def tree_index(tree: _PyTree, idx: int | Array) -> _PyTree:
+def tree_index(tree: _PyTree, idx) -> _PyTree:
     return jtu.tree_map(lambda x: x[idx], tree)
 
 
@@ -84,9 +84,9 @@ def mask2index(mask: jnp.ndarray, n_true: int) -> jnp.ndarray:
 
 def jax_jit_np(
         fn,
-        static_argnums: int | Sequence[int] | None = None,
-        static_argnames: str | Iterable[str] | None = None,
-        donate_argnums: int | Sequence[int] = (),
+        static_argnums=None,
+        static_argnames=None,
+        donate_argnums=(),
         device: xc.Device = None,
         *args,
         **kwargs,
@@ -182,7 +182,7 @@ def tree_stack(trees: list):
     return jtu.tree_map(tree_stack_inner, *trees)
 
 
-def as_shape(shape: int | Shape) -> Shape:
+def as_shape(shape) -> Shape:
     if isinstance(shape, int):
         shape = (shape,)
     if not isinstance(shape, tuple):
@@ -190,11 +190,11 @@ def as_shape(shape: int | Shape) -> Shape:
     return shape
 
 
-def get_or(maybe: _T | None, value: _U) -> _T | _U:
+def get_or(maybe, value: _U):
     return value if maybe is None else maybe
 
 
-def assert_shape(arr: _Arr, shape: int | Shape, label: str | None = None) -> _Arr:
+def assert_shape(arr: _Arr, shape, label = None) -> _Arr:
     shape = as_shape(shape)
     label = get_or(label, "array")
     if arr.shape != shape:
@@ -202,6 +202,6 @@ def assert_shape(arr: _Arr, shape: int | Shape, label: str | None = None) -> _Ar
     return arr
 
 
-def tree_where(cond: BoolScalar | bool, true_val: _PyTree, false_val: _PyTree) -> _PyTree:
+def tree_where(cond, true_val: _PyTree, false_val: _PyTree) -> _PyTree:
     return jtu.tree_map(lambda x, y: jnp.where(cond, x, y), true_val, false_val)
 
