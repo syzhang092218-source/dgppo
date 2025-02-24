@@ -4,7 +4,7 @@ import jax.random as jr
 import numpy as np
 import functools as ft
 
-from typing import NamedTuple, Tuple, Optional
+from typing import NamedTuple, Tuple, Optional, List
 from abc import ABC, abstractmethod
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -159,7 +159,7 @@ class LidarDubinsCircle(LidarEnv):
         # x_rel, y_rel, vx_rel, vy_rel
         return jnp.array([state[0], state[1], state[4] * state[2], state[4] * state[3]])
 
-    def edge_blocks(self, state: LidarEnvState, lidar_data: Optional[Pos2d] = None) -> list[EdgeBlock]:
+    def edge_blocks(self, state: LidarEnvState, lidar_data: Optional[Pos2d] = None) -> List[EdgeBlock]:
         # agent - agent connection
         agent_pos = state.agent[:, :2]
         pos_diff = agent_pos[:, None, :] - agent_pos[None, :, :]  # [i, j]: i -> j

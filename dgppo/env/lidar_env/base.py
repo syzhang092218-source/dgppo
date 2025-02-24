@@ -4,7 +4,7 @@ import jax.random as jr
 import numpy as np
 import functools as ft
 
-from typing import NamedTuple, Tuple, Optional
+from typing import NamedTuple, Tuple, Optional, List
 from abc import ABC, abstractmethod
 
 from jaxtyping import Float
@@ -221,7 +221,7 @@ class LidarEnv(MultiAgentEnv, ABC):
                      Ta_is_unsafe=Ta_is_unsafe, viz_opts=viz_opts, n_goal=self.num_goals, dpi=dpi, **kwargs)
 
     @abstractmethod
-    def edge_blocks(self, state: LidarEnvState, lidar_data: Optional[Pos2d] = None) -> list[EdgeBlock]:
+    def edge_blocks(self, state: LidarEnvState, lidar_data: Optional[Pos2d] = None) -> List[EdgeBlock]:
         pass
 
     def get_graph(self, state: LidarEnvState, lidar_data: Pos2d = None) -> GraphsTuple:

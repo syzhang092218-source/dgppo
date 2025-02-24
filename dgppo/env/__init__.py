@@ -1,26 +1,27 @@
 from typing import Optional
 
 from .base import MultiAgentEnv
-from dgppo.env.mpe import MPETarget, MPESpread, MPELine, MPEFormation, MPECorridor, MPEConnectSpread
-from dgppo.env.lidar_env import LidarSpread, LidarTarget, LidarLine, LidarBicycleTarget, LidarDubinsCircle
-from dgppo.env.vmas import VMASWheel, VMASReverseTransport
+# from dgppo.env.mpe import MPETarget, MPESpread, MPELine, MPEFormation, MPECorridor, MPEConnectSpread
+# from dgppo.env.lidar_env import LidarSpread, LidarTarget, LidarLine, LidarBicycleTarget, LidarDubinsCircle
+# from dgppo.env.vmas import VMASWheel, VMASReverseTransport
+from dgppo.env.lidar_env import LidarDubinsCircle
 
 
 ENV = {
 
-    'MPETarget': MPETarget,
-    'MPESpread': MPESpread,
-    'MPELine': MPELine,
-    'MPEFormation': MPEFormation,
-    'MPECorridor': MPECorridor,
-    'MPEConnectSpread': MPEConnectSpread,
-    'LidarSpread': LidarSpread,
-    'LidarTarget': LidarTarget,
-    'LidarLine': LidarLine,
+    # 'MPETarget': MPETarget,
+    # 'MPESpread': MPESpread,
+    # 'MPELine': MPELine,
+    # 'MPEFormation': MPEFormation,
+    # 'MPECorridor': MPECorridor,
+    # 'MPEConnectSpread': MPEConnectSpread,
+    # 'LidarSpread': LidarSpread,
+    # 'LidarTarget': LidarTarget,
+    # 'LidarLine': LidarLine,
     'LidarDubinsCircle': LidarDubinsCircle,
-    'LidarBicycleTarget': LidarBicycleTarget,
-    'VMASReverseTransport': VMASReverseTransport,
-    'VMASWheel': VMASWheel,
+    # 'LidarBicycleTarget': LidarBicycleTarget,
+    # 'VMASReverseTransport': VMASReverseTransport,
+    # 'VMASWheel': VMASWheel,
 }
 
 

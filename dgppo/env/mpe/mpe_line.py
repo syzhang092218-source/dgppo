@@ -2,7 +2,7 @@ import jax.numpy as jnp
 import jax.random as jr
 import jax
 
-from typing import Optional
+from typing import Optional, List
 
 from dgppo.utils.graph import GraphsTuple
 from dgppo.utils.typing import Action, Array, Pos2d, Reward

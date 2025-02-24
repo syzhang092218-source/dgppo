@@ -149,7 +149,7 @@ def is_connected():
     return internet()
 
 
-def centered_norm(vmin: float | list[float], vmax: float | list[float]):
+def centered_norm(vmin, vmax):
     if isinstance(vmin, list):
         vmin = min(vmin)
     if isinstance(vmax, list):

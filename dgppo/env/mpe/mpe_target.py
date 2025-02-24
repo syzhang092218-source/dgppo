@@ -1,6 +1,6 @@
 import jax.numpy as jnp
 
-from typing import Optional
+from typing import Optional, List
 
 from dgppo.utils.graph import EdgeBlock
 from dgppo.utils.typing import Action, Reward
@@ -48,7 +48,7 @@ class MPETarget(MPE):
 
         return reward
 
-    def edge_blocks(self, state: MPEEnvState) -> list[EdgeBlock]:
+    def edge_blocks(self, state: MPEEnvState) -> List[EdgeBlock]:
         # agent - agent connection
         agent_pos = state.agent[:, :2]
         pos_diff = agent_pos[:, None, :] - agent_pos[None, :, :]  # [i, j]: i -> j

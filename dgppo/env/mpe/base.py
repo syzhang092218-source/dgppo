@@ -3,7 +3,7 @@ import jax
 import jax.numpy as jnp
 import jax.random as jr
 
-from typing import NamedTuple, Tuple, Optional
+from typing import NamedTuple, Tuple, Optional, List
 from abc import ABC, abstractmethod
 
 from dgppo.env.plot import render_mpe
@@ -205,7 +205,7 @@ class MPE(MultiAgentEnv, ABC):
                    n_goal=self.num_goals, dpi=dpi, **kwargs)
 
     @abstractmethod
-    def edge_blocks(self, state: MPEEnvState) -> list[EdgeBlock]:
+    def edge_blocks(self, state: MPEEnvState) -> List[EdgeBlock]:
         pass
 
     def get_graph(self, env_state: MPEEnvState) -> MPEEnvGraphsTuple:
