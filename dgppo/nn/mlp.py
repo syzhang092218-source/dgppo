@@ -8,8 +8,8 @@ class MLP(nn.Module):
     act: ActFn = nn.relu
     act_final: bool = True
     use_layernorm: bool = True
-    scale_final: float | None = None
-    dropout_rate: float | None = None
+    scale_final: float = None
+    dropout_rate: float = None
 
     @nn.compact
     def __call__(self, x: AnyFloat, apply_dropout: bool = False) -> AnyFloat:

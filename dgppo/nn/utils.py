@@ -1,14 +1,14 @@
 import flax.linen as nn
 import jax.numpy as jnp
 
-from typing import Any, Callable, Literal, Sequence, Iterable, Generator, TypeVar
+from typing import Any, Callable, Literal, Sequence, Iterable, Generator, TypeVar, Dict, Tuple
 from jaxtyping import Array, Float
 
 
 ActFn = Callable[[Array], Array]
 PRGNKey = Float[Array, '2']
 AnyFloat = Float[Array, '*']
-Shape = tuple[int, ...]
+Shape = Tuple[int, ...]
 InitFn = Callable[[PRGNKey, Shape, Any], Any]
 HidSizes = Sequence[int]
 
@@ -31,13 +31,13 @@ ActLiteral = Literal["relu", "tanh", "elu", "swish", "silu", "gelu", "softplus"]
 
 
 def get_act_from_str(act_str: ActLiteral) -> ActFn:
-    act_dict: dict[Literal, ActFn] = dict(
+    act_dict: Dict[Literal, ActFn] = dict(
         relu=nn.relu, tanh=nn.tanh, elu=nn.elu, swish=nn.swish, silu=nn.silu, gelu=nn.gelu, softplus=nn.softplus
     )
     return act_dict[act_str]
 
 
-def signal_last_enumerate(it: Iterable[_Elem]) -> Generator[tuple[bool, int, _Elem], None, None]:
+def signal_last_enumerate(it: Iterable[_Elem]) -> Generator[Tuple[bool, int, _Elem], None, None]:
     iterable = iter(it)
     count = 0
     ret_var = next(iterable)

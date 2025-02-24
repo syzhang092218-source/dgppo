@@ -2,7 +2,7 @@ import functools as ft
 import flax.linen as nn
 import jax.numpy as jnp
 
-from typing import Type, Any
+from typing import Type, Any, Tuple
 
 from ...nn.mlp import MLP
 from ...nn.gnn import GraphTransformerGNN, GNN
@@ -146,7 +146,7 @@ class ValueNet:
                 rnn_cls=self.rnn,
             )
 
-    def initialize_carry(self, key: PRNGKey) -> tuple[Array | Any, Array | Any] | Array:
+    def initialize_carry(self, key: PRNGKey):
         if self.use_rnn:
             return self.rnn_base().initialize_carry(key, (self.gnn_out_dim,))
         else:

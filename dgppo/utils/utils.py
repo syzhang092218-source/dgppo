@@ -30,7 +30,7 @@ _T = TypeVar("_T")
 _U = TypeVar("_U")
 
 
-def jax_vmap(fn, in_axes: int, out_axes: Any = 0):
+def jax_vmap(fn, in_axes: int = 0, out_axes: Any = 0):
     return jax.vmap(fn, in_axes, out_axes)
 
 

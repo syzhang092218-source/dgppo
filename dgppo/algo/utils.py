@@ -3,6 +3,7 @@ import jax.numpy as jnp
 import einops as ei
 
 from jaxtyping import Float
+from typing import Tuple
 
 from ..utils.typing import Array, TFloat
 from ..utils.utils import assert_shape
@@ -16,7 +17,7 @@ def compute_dec_ocp_gae(
     disc_gamma: float,
     gae_lambda: float,
     discount_to_max: bool = True
-) -> tuple[Float[Array, "T a nh"], TFloat]:
+) -> Tuple[Float[Array, "T a nh"], TFloat]:
     """
     Compute GAE for MASOCP. Compute it using DP, starting at V(x_T) and working backwards.
 

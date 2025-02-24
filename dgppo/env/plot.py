@@ -898,7 +898,7 @@ def render_graph(
                         settings["moving_node_labels"][ii], **label_font_opts))
 
     # init function for animation
-    def init_fn() -> list[plt.Artist]:
+    def init_fn() -> List[plt.Artist]:
         plot_objects = [*static_node_labels, *moving_node_labels, *cost_text, *safe_text, *kk_text]
         if n_static_node > 0:
             plot_objects.append(static_nodes_col)

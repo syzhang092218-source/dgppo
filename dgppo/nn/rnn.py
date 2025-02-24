@@ -8,7 +8,7 @@ from ..utils.utils import jax_vmap
 
 
 class RNN(nn.Module):
-    rnn_cls: Type[nn.LSTMCell] | Type[nn.GRUCell]
+    rnn_cls: Type[nn.GRUCell]
     rnn_layers: int
 
     @nn.compact

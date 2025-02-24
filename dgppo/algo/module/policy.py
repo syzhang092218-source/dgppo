@@ -182,7 +182,7 @@ class PPOPolicy(MultiAgentPolicy):
             )
             self.dist = TanhNormal(base_cls=self.policy_base, _nu=action_dim)
 
-    def initialize_carry(self, key: PRNGKey) -> tuple[Array | Any, Array | Any] | Array:
+    def initialize_carry(self, key: PRNGKey):
         if self.use_rnn:
             return self.rnn_base().initialize_carry(key, (self.gnn_out_dim,))
         else:
