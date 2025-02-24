@@ -81,7 +81,7 @@ class Policy:
 
     def get_action(self, graph: GraphsTuple) -> Tuple[float, float]:
         # get NN outputs
-        u_nn = self.act_fn(graph, self.init_rnn_state)
+        u_nn, _ = self.act_fn(graph, self.init_rnn_state)
 
         # convert to real control
         agent_states = graph.type_states(type_idx=0, n_type=self.env.num_agents)
