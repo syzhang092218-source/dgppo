@@ -29,3 +29,5 @@ if __name__ == '__main__':
         move_jackal()
     except rospy.ROSInterruptException:
         pass
+
+"sparkal1/odom"

@@ -56,8 +56,8 @@ class JackalMover:
 
     def action2cmd_vel(self, omega, v) -> Twist:
         cmd_vel = Twist()
-        cmd_vel.linear.x = omega
-        cmd_vel.angular.z = v
+        cmd_vel.linear.x = v
+        cmd_vel.angular.z = omega
         return cmd_vel
 
     def run(self):
