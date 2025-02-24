@@ -85,8 +85,8 @@ class Policy:
 
         # convert to real control
         agent_states = graph.type_states(type_idx=0, n_type=self.env.num_agents)
-        omega = u_nn[0]
-        acc = u_nn[1] * self.acc_scale
+        omega = u_nn[0, 0]
+        acc = u_nn[0, 1] * self.acc_scale
         v = acc * self.dt + agent_states[0, 4]
 
         return omega, v
