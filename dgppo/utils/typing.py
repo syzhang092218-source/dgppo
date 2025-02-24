@@ -1,6 +1,6 @@
 from flax.core import FrozenDict
 from jaxtyping import Array, Bool, Float, Int, Shaped
-from typing import Dict, Any
+from typing import Dict, Any, Tuple
 from numpy import ndarray
 
 
@@ -9,7 +9,7 @@ PRNGKey = Float[Array, '2']
 
 BoolScalar = Bool[Array, ""]
 ABool = Bool[Array, "num_agents"]
-Shape = tuple[int, ...]
+Shape = Tuple[int, ...]
 
 BFloat = Float[Array, "b"]
 BInt = Int[Array, "b"]
@@ -35,7 +35,7 @@ Radius = Float[Array, ''] | float
 
 
 # neural network types
-Params = dict[str, Any] | FrozenDict[str, Any]
+Params = Dict[str, Any] | FrozenDict[str, Any]
 
 # obstacles
 ObsType = Int[Array, '']
