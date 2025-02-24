@@ -6,6 +6,7 @@ import functools as ft
 
 from typing import NamedTuple, Tuple, Optional, List
 from abc import ABC, abstractmethod
+
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 from matplotlib.axes import Axes
@@ -101,6 +102,11 @@ class LidarDubinsCircle(LidarEnv):
         theta = jr.uniform(theta_key, (self.num_agents,), minval=0, maxval=2 * np.pi)
         states = jnp.concatenate([states, jnp.cos(theta)[:, None], jnp.sin(theta)[:, None],
                                   jnp.zeros((self.num_agents, 1))], axis=-1)
+
+        states = states.at[0, 0].set(0)
+        states = states.at[0, 1].set(0)
+        states = states.at[0, 2].set(1)
+        states = states.at[0, 3].set(0)
 
         # states = jnp.array([[R + self.params["car_radius"], self.params["car_radius"], 1., 0., 0.]])
 

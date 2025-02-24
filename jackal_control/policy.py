@@ -1,4 +1,5 @@
 import os
+import numpy as np
 from typing import Tuple
 
 import yaml
@@ -35,6 +36,7 @@ class Policy:
             num_agents=config.num_agents,
             num_obs=config.obs,
         )
+        self.state_lim = self.env.state_lim
 
         # create algorithm
         self.algo = make_algo(
@@ -88,5 +90,6 @@ class Policy:
         omega = u_nn[0, 0]
         acc = u_nn[0, 1] * self.acc_scale
         v = acc * self.dt + agent_states[0, 4]
+        v = np.clip(v, self.state_lim()[0][4], self.state_lim()[1][4])
 
         return omega, v

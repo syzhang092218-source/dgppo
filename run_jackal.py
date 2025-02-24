@@ -21,6 +21,9 @@ class JackalMover:
         # Subscriber to get Jackal's odometry
         self.odom_sub = rospy.Subscriber('/sparkal1/odom', Odometry, self.odom_callback)
 
+        # Publisher of the current orientation
+        self.orientation_pub = rospy.Publisher('/sparkal1/jackal_orientation', float, queue_size=10)
+
         # Initialize robot state
         self.position = [0.0, 0.0]  # (x, y)
         self.orientation = 0.0  # Yaw (in radians)
@@ -77,6 +80,7 @@ class JackalMover:
 
             # Publish velocity command
             self.vel_pub.publish(cmd_vel)
+            self.orientation_pub.publish(self.orientation)
 
             # Maintain loop rate
             self.rate.sleep()
