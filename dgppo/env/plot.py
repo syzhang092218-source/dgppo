@@ -721,3 +721,270 @@ def render_lidar(
     anim_T = len(T_graph.n_node)
     ani = FuncAnimation(fig, update, frames=anim_T, init_func=init_fn, interval=mspf, blit=True)
     save_anim(ani, video_path)
+
+
+def get_heading_indicator(pos: Pos2d, theta: Array, radius: Array) -> Rectangle:
+    pos_indicator = pos - radius / 2 * jnp.stack([jnp.cos(theta), jnp.sin(theta)], axis=-1)
+    body = Rectangle.create(pos_indicator, theta=theta, width=radius, height=radius / 4)
+    return body
+
+
+def render_graph(
+        side_length: float,
+        dim: int,
+        T: int,
+        video_path: pathlib.Path,
+        settings: dict,
+        T_data: dict,
+        dpi: int = 100,
+        fps: float = 30.0,
+        **kwargs
+):
+    # check setting
+    assert dim in [2]  # only support 2D for now
+    assert 'n_static_node' in settings.keys()
+    assert 'n_moving_node' in settings.keys()
+    n_static_node = settings['n_static_node']
+    n_moving_node = settings['n_moving_node']
+    # node information
+    if n_static_node > 0:
+        assert "static_node_r" in settings.keys()
+        assert "static_node_color" in settings.keys()
+        assert "static_node_labels" in settings.keys()
+        assert "static_node_pos" in T_data.keys()
+    if n_moving_node > 0:
+        assert "moving_node_r" in settings.keys()
+        assert "moving_node_color" in settings.keys()
+        assert "moving_node_labels" in settings.keys()
+        assert "T_moving_node_pos" in T_data.keys()
+    # edge information
+    if "T_edge_index" in T_data.keys():
+        assert "T_edge_node_pos" in T_data.keys()
+        assert "T_edge_colors" in T_data.keys()
+    # heading information
+    if "T_heading" in T_data.keys():
+        assert "heading_color" in settings.keys()
+    # steering information
+    if "T_steering" in T_data.keys():
+        assert "steering_color" in settings.keys()
+    # other labels
+    if "Ta_is_unsafe" not in T_data.keys():
+        T_data["Ta_is_unsafe"] = None
+    if "T_costs" not in T_data.keys():
+        T_data["T_costs"] = None
+        settings["cost_components"] = []
+    else:
+        assert "cost_components" in settings.keys()
+    if "T_rewards" not in T_data.keys():
+        T_data["T_rewards"] = None
+
+    # set up visualization option
+    ax: Axes
+    fig, ax = plt.subplots(1, 1, figsize=(10, 10), dpi=dpi)
+    ax.set_xlim(0., side_length)
+    ax.set_ylim(0., side_length)
+    ax.set(aspect="equal")
+    plt.axis("off")
+
+    # plot the first frame
+    # static obstacles
+    if "static_obstacles" in T_data.keys():
+        static_obstacles = T_data["static_obstacles"]
+        assert "obstacle_color" in settings.keys()
+        if static_obstacles is not None:
+            ax.add_collection(get_obs_collection(static_obstacles, settings["obstacle_color"], alpha=0.8))
+
+    # static nodes
+    if n_static_node > 0:
+        static_nodes = [plt.Circle(T_data["static_node_pos"][ii], settings["static_node_r"][ii],
+                                   color=settings["static_node_color"][ii], linewidth=0.0)
+                        for ii in range(n_static_node)]
+        static_nodes_col = MutablePatchCollection([i for i in static_nodes], match_original=True, zorder=6)
+        ax.add_collection(static_nodes_col)
+    else:
+        static_nodes = []
+
+    # moving nodes
+    if n_moving_node > 0:
+        moving_nodes = [plt.Circle(T_data["T_moving_node_pos"][0][ii], settings["moving_node_r"][ii],
+                                   color=settings["moving_node_color"][ii], linewidth=0.0)
+                        for ii in range(n_moving_node)]
+        moving_nodes_col = MutablePatchCollection([i for i in moving_nodes], match_original=True, zorder=8)
+        ax.add_collection(moving_nodes_col)
+
+        # add heading
+        if "T_heading" in T_data.keys():
+            get_heading_indicator_ = jax.jit(jax.vmap(get_heading_indicator))
+            valid = jnp.logical_not(jnp.isnan(T_data["T_heading"][0]))
+            heading_indicator = get_heading_indicator_(
+                T_data["T_moving_node_pos"][0][valid],
+                T_data["T_heading"][0][valid],
+                jnp.array(settings["moving_node_r"])[valid]
+            )
+            heading_poly = []
+            for ii in range(valid.sum()):
+                heading_poly.append(Polygon(heading_indicator.points[ii]))
+            heading_col = MutablePatchCollection(heading_poly, color=settings["heading_color"], alpha=1.0, zorder=10)
+            ax.add_collection(heading_col)
+
+        # add steering
+        if "T_steering" in T_data.keys():
+            get_steering_indicator_ = jax.jit(jax.vmap(get_steering_indicator))
+            valid = jnp.logical_not(jnp.isnan(T_data["T_steering"][0]))
+            steering_indicator = get_steering_indicator_(
+                T_data["T_moving_node_pos"][0][valid],
+                T_data["T_steering"][0][valid],
+                jnp.array(settings["moving_node_r"])[valid]
+            )
+            steering_poly = []
+            for ii in range(valid.sum()):
+                steering_poly.append(Polygon(steering_indicator.points[ii]))
+            steering_col = MutablePatchCollection(steering_poly, color=settings["steering_color"], alpha=1.0, zorder=10)
+            ax.add_collection(steering_col)
+    else:
+        moving_nodes = []
+
+    # edges
+    if "T_edge_index" in T_data.keys():
+        edge_node_pos = T_data["T_edge_node_pos"][0]
+        e_edge_index = T_data["T_edge_index"][0]
+        e_start, e_end = edge_node_pos[e_edge_index[0, :]], edge_node_pos[e_edge_index[1, :]]
+        e_lines = np.stack([e_start, e_end], axis=1)
+        edge_col = LineCollection(e_lines, colors=T_data["T_edge_colors"][0], linewidths=2, alpha=0.5, zorder=3)
+        ax.add_collection(edge_col)
+    else:
+        edge_col = []
+
+    # text for cost and reward
+    text_font_opts = dict(
+        size=16,
+        color="k",
+        family="cursive",
+        weight="normal",
+        transform=ax.transAxes,
+    )
+    cost_text = [ax.text(0.02, 1.00, "Cost: 1.0\nReward: 1.0", va="bottom", **text_font_opts)]
+
+    # text for safety
+    safe_text = []
+    if T_data["Ta_is_unsafe"] is not None:
+        safe_text = [ax.text(0.99, 1.00, "Unsafe: {}", va="bottom", ha="right", **text_font_opts)]
+
+    # text for time step
+    kk_text = [ax.text(0.99, 1.04, "kk=0", va="bottom", ha="right", **text_font_opts)]
+
+    # add node labels
+    label_font_opts = dict(
+        size=20,
+        color="k",
+        family="cursive",
+        weight="normal",
+        ha="center",
+        va="center",
+        transform=ax.transData,
+        clip_on=True,
+        zorder=99,
+    )
+    static_node_labels = []
+    for ii in range(n_static_node):
+        if settings["static_node_labels"][ii] is not None:
+            static_node_labels.append(ax.text(T_data["static_node_pos"][ii][0], T_data["static_node_pos"][ii][1],
+                                              settings["static_node_labels"][ii], **label_font_opts))
+    moving_node_labels = []
+    for ii in range(n_moving_node):
+        if settings["moving_node_labels"][ii] is not None:
+            moving_node_labels.append(
+                ax.text(T_data["T_moving_node_pos"][0][ii][0], T_data["T_moving_node_pos"][0][ii][1],
+                        settings["moving_node_labels"][ii], **label_font_opts))
+
+    # init function for animation
+    def init_fn() -> list[plt.Artist]:
+        plot_objects = [*static_node_labels, *moving_node_labels, *cost_text, *safe_text, *kk_text]
+        if n_static_node > 0:
+            plot_objects.append(static_nodes_col)
+        if n_moving_node > 0:
+            plot_objects.append(moving_nodes_col)
+        if "T_edge_index" in T_data.keys():
+            plot_objects.append(edge_col)
+        return plot_objects
+
+    # update function for animation
+    def update(kk: int) -> List[plt.Artist]:
+        # update moving node positions
+        if n_moving_node > 0:
+            for ii in range(n_moving_node):
+                moving_nodes[ii].set_center(T_data["T_moving_node_pos"][kk][ii])
+
+            # update heading
+            if "T_heading" in T_data.keys():
+                valid_t = jnp.logical_not(jnp.isnan(T_data["T_heading"][kk]))
+                heading_indicator_t = get_heading_indicator_(
+                    T_data["T_moving_node_pos"][kk][valid_t],
+                    T_data["T_heading"][kk][valid_t],
+                    jnp.array(settings["moving_node_r"])[valid_t]
+                )
+                for ii in range(valid_t.sum()):
+                    heading_poly[ii].set_xy(heading_indicator_t.points[ii])
+
+            # update steering
+            if "T_steering" in T_data.keys():
+                valid_t = jnp.logical_not(jnp.isnan(T_data["T_steering"][kk]))
+                steering_indicator_t = get_steering_indicator_(
+                    T_data["T_moving_node_pos"][kk][valid_t],
+                    T_data["T_steering"][kk][valid_t],
+                    jnp.array(settings["moving_node_r"])[valid_t]
+                )
+                for ii in range(valid_t.sum()):
+                    steering_poly[ii].set_xy(steering_indicator_t.points[ii])
+
+        # update edges
+        if "T_edge_index" in T_data.keys():
+            e_edge_index_t = T_data["T_edge_index"][kk]
+            edge_node_pos_t = T_data["T_edge_node_pos"][kk]
+            e_start_t, e_end_t = edge_node_pos_t[e_edge_index_t[0, :]], edge_node_pos_t[e_edge_index_t[1, :]]
+            e_lines_t = np.stack([e_start_t, e_end_t], axis=1)
+            edge_col.set_segments(e_lines_t)
+            edge_col.set_colors(T_data["T_edge_colors"][kk])
+
+        # update node labels
+        moving_node_label_id = 0
+        for ii in range(n_moving_node):
+            if settings["moving_node_labels"][ii] is not None:
+                moving_node_labels[moving_node_label_id].set_position(T_data["T_moving_node_pos"][kk][ii])
+                moving_node_label_id += 1
+
+        # update cost and reward
+        cost_text_ = ""
+        if T_data["T_costs"] is not None:
+            all_costs = ""
+            for i_cost in range(T_data["T_costs"][kk].shape[1]):
+                all_costs += (f"    {settings['cost_components'][i_cost]}: "
+                              f"{T_data['T_costs'][kk][:, i_cost].max():5.4f}\n")
+            all_costs = all_costs[:-2]
+            cost_text_ += f"Cost:\n{all_costs}\n"
+        if T_data["T_rewards"] is not None:
+            cost_text_ += f"Reward: {T_data['T_rewards'][kk]:5.4f}"
+        cost_text[0].set_text(cost_text_)
+
+        # update safe labels
+        if T_data["Ta_is_unsafe"] is not None:
+            a_is_unsafe = T_data["Ta_is_unsafe"][kk]
+            unsafe_idx = np.where(a_is_unsafe)[0]
+            safe_text[0].set_text("Unsafe: {}".format(unsafe_idx))
+
+        # update time step
+        kk_text[0].set_text("kk={:04}".format(kk))
+
+        plot_objects = [*static_node_labels, *moving_node_labels, *cost_text, *safe_text, *kk_text]
+        if n_static_node > 0:
+            plot_objects.append(static_nodes_col)
+        if n_moving_node > 0:
+            plot_objects.append(moving_nodes_col)
+        if "T_edge_index" in T_data.keys():
+            plot_objects.append(edge_col)
+        return plot_objects
+
+    spf = 1 / fps
+    mspf = 1_000 * spf
+    ani = FuncAnimation(fig, update, frames=T, init_func=init_fn, interval=mspf, blit=True)
+    save_anim(ani, video_path)
