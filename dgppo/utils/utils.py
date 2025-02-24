@@ -6,7 +6,7 @@ import matplotlib.collections as mcollections
 import numpy as np
 
 from datetime import timedelta
-from typing import Any, Callable, Iterable, ParamSpec, Sequence, TypeVar, Tuple, List, NamedTuple
+from typing import Any, Callable, Iterable, Sequence, TypeVar, Tuple, List, NamedTuple
 from jax import numpy as jnp, tree_util as jtu
 from jax._src.lib import xla_client as xc
 from matplotlib.animation import FuncAnimation
@@ -20,9 +20,9 @@ def merge01(x):
     return ei.rearrange(x, "n1 n2 ... -> (n1 n2) ...")
 
 
-_P = ParamSpec("_P")
-_R = TypeVar("_R")
-_Fn = Callable[_P, _R]
+# _P = ParamSpec("_P")
+# _R = TypeVar("_R")
+# _Fn = Callable[_P, _R]
 
 _PyTree = TypeVar("_PyTree")
 _Arr = TypeVar("_Arr", np.ndarray, jnp.ndarray, bool)
@@ -30,11 +30,11 @@ _T = TypeVar("_T")
 _U = TypeVar("_U")
 
 
-def jax_vmap(fn: _Fn, in_axes: int | Sequence[Any] = 0, out_axes: Any = 0) -> _Fn:
+def jax_vmap(fn, in_axes: int | Sequence[Any] = 0, out_axes: Any = 0):
     return jax.vmap(fn, in_axes, out_axes)
 
 
-def rep_vmap(fn: _Fn, rep: int, in_axes: int | Sequence[Any] = 0, **kwargs) -> _Fn:
+def rep_vmap(fn, rep: int, in_axes: int | Sequence[Any] = 0, **kwargs):
     for ii in range(rep):
         fn = jax.vmap(fn, in_axes=in_axes, **kwargs)
     return fn
@@ -83,26 +83,26 @@ def mask2index(mask: jnp.ndarray, n_true: int) -> jnp.ndarray:
 
 
 def jax_jit_np(
-        fn: _Fn,
+        fn,
         static_argnums: int | Sequence[int] | None = None,
         static_argnames: str | Iterable[str] | None = None,
         donate_argnums: int | Sequence[int] = (),
         device: xc.Device = None,
         *args,
         **kwargs,
-) -> _Fn:
+):
     jit_fn = jax.jit(fn, static_argnums, static_argnames, donate_argnums, device, *args, **kwargs)
 
-    def wrapper(*args, **kwargs) -> _R:
+    def wrapper(*args, **kwargs):
         return jax2np(jit_fn(*args, **kwargs))
 
     return wrapper
 
 
-def chunk_vmap(fn: _Fn, chunks: int) -> _Fn:
+def chunk_vmap(fn, chunks: int):
     fn_jit_vmap = jax_jit_np(jax.vmap(fn))
 
-    def wrapper(*args) -> _R:
+    def wrapper(*args):
         args = list(args)
         # 1: Get the batch size.
         batch_size = len(jtu.tree_leaves(args[0])[0])
