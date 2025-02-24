@@ -69,7 +69,7 @@ class JackalMover:
             jackal_state = jackal_state.at[2].set(jnp.cos(self.orientation))
             jackal_state = jackal_state.at[3].set(jnp.sin(self.orientation))
             jackal_state = jackal_state.at[4].set(self.velocity[0])
-            graph = self.policy.create_graph(jackal_state)
+            graph = self.policy.create_graph(jackal_state[None])
 
             # Compute velocity command using get_control()
             action = self.policy.get_action(graph)
