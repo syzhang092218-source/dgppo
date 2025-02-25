@@ -38,7 +38,14 @@ class JackalMover:
         self.policy = Policy(path, policy_key)
 
         # Create goal
-        self.init_graph = self.policy.env.reset(goal_key)
+        self.goals = jnp.array([
+            [2.5, 0],
+            [2.5, 2.5],
+            [0, 2.5],
+            [0, 0],
+        ])
+        self.goal_id = 0
+        # self.init_graph = self.policy.env.reset(goal_key)
 
     def odom_callback(self, msg):
         # Extract position
@@ -70,7 +77,8 @@ class JackalMover:
     def run(self):
         while not rospy.is_shutdown():
             # Get goal position
-            goal_pos = self.init_graph.type_states(type_idx=1, n_type=1)[:, :2]
+            # goal_pos = self.init_graph.type_states(type_idx=1, n_type=1)[:, :2]
+            goal_pos = self.goals[self.goal_id % 4]
 
             # Get Jackal state
             jackal_state = jnp.array([0., 0., 0., 0., 0.])
@@ -95,8 +103,9 @@ class JackalMover:
             dist2goal = jnp.linalg.norm(goal_pos - jackal_state[:2])
             if dist2goal < 0.1:
                 # Get a new goal
-                goal_key, self.key = jr.split(self.key)
-                self.init_graph = self.policy.env.reset(goal_key)
+                # goal_key, self.key = jr.split(self.key)
+                # self.init_graph = self.policy.env.reset(goal_key)
+                self.goal_id += 1
 
             # Maintain loop rate
             self.rate.sleep()
