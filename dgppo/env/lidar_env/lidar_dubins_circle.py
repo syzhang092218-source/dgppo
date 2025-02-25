@@ -32,11 +32,13 @@ class LidarDubinsCircle(LidarEnv):
         'R': 1.,
         "comm_radius": 5,
         "n_rays": 32,
+        "obs_angle": jnp.deg2rad(90),
         "obs_len_range": [0.1, 0.3],
         "n_obs": 3,
         "default_area_size": 3.0,
         "top_k_rays": 8,
-        "v_tgt": 0.5
+        "v_tgt": 0.5,
+        "n_move_obs": 5,
     }
 
     def __init__(
@@ -305,159 +307,3 @@ class LidarDubinsCircle(LidarEnv):
             dpi=dpi,
             **kwargs
         )
-
-        # n_goal = 1
-        #
-        # # set up visualization option
-        # side_length = self.area_size
-        # ax: Axes
-        # fig, ax = plt.subplots(1, 1, figsize=(10, 10), dpi=dpi)
-        # ax.set_xlim(0., side_length)
-        # ax.set_ylim(0., side_length)
-        # ax.set(aspect="equal")
-        # plt.axis("on")
-        #
-        # if viz_opts is None:
-        #     viz_opts = {}
-        #
-        # # plot the first frame
-        # T_graph = rollout.graph
-        # graph0 = tree_index(T_graph, 0)
-        #
-        # agent_color = "#0068ff"
-        # goal_color = "#2fdd00"
-        # obs_color = "#8a0000"
-        # edge_goal_color = goal_color
-        #
-        # # plot obstacles
-        # if hasattr(graph0.env_states, "obstacle"):
-        #     obs = graph0.env_states.obstacle
-        #     if obs is not None:
-        #         ax.add_collection(get_obs_collection(obs, obs_color, alpha=0.8))
-        #
-        # # plot the tracking trajectory
-        # tgt_traj = plt.Circle((side_length / 2, side_length / 2), self._params["R"],
-        #                       color=goal_color, linewidth=1.0, fill=False)
-        # ax.add_patch(tgt_traj)
-        #
-        # # plot agents
-        # n_agent = self.num_agents
-        # r = self._params["car_radius"]
-        # n_rays = self._params["n_rays"] if self.params["n_obs"] > 0 else 0
-        # n_hits = n_agent * n_rays
-        # n_color = [agent_color] * n_agent
-        # n_pos = np.array(graph0.states[:n_agent, :2]).astype(np.float32)
-        # n_radius = np.array([r] * n_agent)
-        # agent_circs = [plt.Circle(n_pos[ii], n_radius[ii], color=n_color[ii], linewidth=0.0)
-        #                for ii in range(n_agent)]
-        # agent_col = MutablePatchCollection([i for i in reversed(agent_circs)], match_original=True, zorder=6)
-        # ax.add_collection(agent_col)
-        #
-        # # plot the heading
-        # for ii in range(n_agent):
-        #     agent_theta = np.arctan2(graph0.states[ii, 3], graph0.states[ii, 2])
-        #     ax.arrow(n_pos[ii, 0], n_pos[ii, 1], 0.5 * np.cos(agent_theta), 0.5 * np.sin(agent_theta),
-        #              head_width=0.1, head_length=0.1, fc='k', ec='k', zorder=7)
-        #
-        # # plot edges
-        # all_pos = graph0.states[:n_agent + n_goal + n_hits, :2]
-        # edge_index = np.stack([graph0.senders, graph0.receivers], axis=0)
-        # is_pad = np.any(edge_index == n_agent + n_goal + n_hits, axis=0)
-        # # is_pad = is_pad | np.any(edge_index == n_agent + n_goal - 1, axis=0)  # do not plot goal-agent edges
-        # e_edge_index = edge_index[:, ~is_pad]
-        # e_start, e_end = all_pos[e_edge_index[0, :]], all_pos[e_edge_index[1, :]]
-        # e_lines = np.stack([e_start, e_end], axis=1)  # (e, n_pts, dim)
-        # e_is_goal = (n_agent <= graph0.senders) & (graph0.senders < n_agent + n_goal)
-        # e_is_goal = e_is_goal[~is_pad]
-        # e_colors = [edge_goal_color if e_is_goal[ii] else "0.2" for ii in range(len(e_start))]
-        # edge_col = LineCollection(e_lines, colors=e_colors, linewidths=2, alpha=0.5, zorder=3)
-        # ax.add_collection(edge_col)
-        #
-        # # text for cost and reward
-        # text_font_opts = dict(
-        #     size=16,
-        #     color="k",
-        #     family="cursive",
-        #     weight="normal",
-        #     transform=ax.transAxes,
-        # )
-        # cost_text = ax.text(0.02, 1.00, "Cost: 1.0\nReward: 1.0", va="bottom", **text_font_opts)
-        #
-        # # text for safety
-        # safe_text = []
-        # if Ta_is_unsafe is not None:
-        #     safe_text = [ax.text(0.99, 1.00, "Unsafe: {}", va="bottom", ha="right", **text_font_opts)]
-        #
-        #
-        # # text for time step
-        # kk_text = ax.text(0.99, 1.04, "kk=0", va="bottom", ha="right", **text_font_opts)
-        #
-        # # add agent labels
-        # label_font_opts = dict(
-        #     size=20,
-        #     color="k",
-        #     family="cursive",
-        #     weight="normal",
-        #     ha="center",
-        #     va="center",
-        #     transform=ax.transData,
-        #     clip_on=True,
-        #     zorder=7,
-        # )
-        # agent_labels = [ax.text(n_pos[ii, 0], n_pos[ii, 1], f"{ii}", **label_font_opts) for ii in range(n_agent)]
-        #
-        # # init function for animation
-        # def init_fn() -> list[plt.Artist]:
-        #     return [agent_col, edge_col, *agent_labels, cost_text, *safe_text, kk_text]
-        #
-        # # update function for animation
-        # def update(kk: int) -> list[plt.Artist]:
-        #     graph = tree_index(T_graph, kk)
-        #     n_pos_t = graph.states[:-1, :2]
-        #
-        #     # update agent positions
-        #     for ii in range(n_agent):
-        #         agent_circs[ii].set_center(tuple(n_pos_t[ii]))
-        #
-        #     # update edges
-        #     e_edge_index_t = np.stack([graph.senders, graph.receivers], axis=0)
-        #     is_pad_t = np.any(e_edge_index_t == n_agent + n_goal + n_hits, axis=0)
-        #     e_edge_index_t = e_edge_index_t[:, ~is_pad_t]
-        #     e_start_t, e_end_t = n_pos_t[e_edge_index_t[0, :]], n_pos_t[e_edge_index_t[1, :]]
-        #     e_is_goal_t = (n_agent <= graph.senders) & (graph.senders < n_agent + n_goal)
-        #     e_is_goal_t = e_is_goal_t[~is_pad_t]
-        #     e_colors_t = [edge_goal_color if e_is_goal_t[ii] else "0.2" for ii in range(len(e_start_t))]
-        #     e_lines_t = np.stack([e_start_t, e_end_t], axis=1)
-        #     edge_col.set_segments(e_lines_t)
-        #     edge_col.set_colors(e_colors_t)
-        #
-        #     # update agent labels
-        #     for ii in range(n_agent):
-        #         agent_labels[ii].set_position(n_pos_t[ii])
-        #
-        #     # update cost and safe labels
-        #     if kk < len(rollout.costs):
-        #         all_costs = ""
-        #         for i_cost in range(rollout.costs[kk].shape[1]):
-        #             all_costs += f"    {self.cost_components[i_cost]}: {rollout.costs[kk][:, i_cost].max():5.4f}\n"
-        #         all_costs = all_costs[:-2]
-        #         cost_text.set_text(f"Cost:\n{all_costs}\nReward: {rollout.rewards[kk]:5.4f}")
-        #     else:
-        #         cost_text.set_text("")
-        #     if kk < len(Ta_is_unsafe):
-        #         a_is_unsafe = Ta_is_unsafe[kk]
-        #         unsafe_idx = np.where(a_is_unsafe)[0]
-        #         safe_text[0].set_text("Unsafe: {}".format(unsafe_idx))
-        #     else:
-        #         safe_text[0].set_text("Unsafe: {}")
-        #
-        #     kk_text.set_text("kk={:04}".format(kk))
-        #
-        #     return [agent_col, edge_col, *agent_labels, cost_text, *safe_text, kk_text]
-        #
-        # fps = 30.0
-        # spf = 1 / fps
-        # mspf = 1_000 * spf
-        # anim_T = len(T_graph.n_node)
-        # ani = FuncAnimation(fig, update, frames=anim_T, init_func=init_fn, interval=mspf, blit=True)
-        # save_anim(ani, video_path)

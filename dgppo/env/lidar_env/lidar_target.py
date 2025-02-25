@@ -1,6 +1,6 @@
 import jax.numpy as jnp
 
-from typing import Optional
+from typing import Optional, List
 
 from dgppo.utils.graph import EdgeBlock
 from dgppo.utils.typing import Action, Array, Pos2d, Reward, State
@@ -54,7 +54,7 @@ class LidarTarget(LidarEnv):
     def state2feat(self, state: State) -> Array:
         return state
 
-    def edge_blocks(self, state: LidarEnvState, lidar_data: Optional[Pos2d] = None) -> list[EdgeBlock]:
+    def edge_blocks(self, state: LidarEnvState, lidar_data: Optional[Pos2d] = None) -> List[EdgeBlock]:
         # agent - agent connection
         agent_pos = state.agent[:, :2]
         pos_diff = agent_pos[:, None, :] - agent_pos[None, :, :]  # [i, j]: i -> j
@@ -94,3 +94,4 @@ class LidarTarget(LidarEnv):
                 )
 
         return [agent_agent_edges] + agent_goal_edges + agent_obs_edges
+

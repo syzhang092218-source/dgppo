@@ -3,3 +3,4 @@
 # from .lidar_line import LidarLine
 # from .lidar_bicycle_target import LidarBicycleTarget
 from .lidar_dubins_circle import LidarDubinsCircle
+from .lidar_dubins_target import LidarDubinsTarget

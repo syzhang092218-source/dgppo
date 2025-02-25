@@ -1,10 +1,10 @@
 import os
 import numpy as np
-from typing import Tuple
-
 import yaml
 import jax.random as jr
-from wandb import Graph
+import jax.numpy as jnp
+
+from typing import Tuple
 
 from dgppo.env import make_env
 from dgppo.env.lidar_env.base import LidarEnvState
@@ -76,8 +76,10 @@ class Policy:
         self.nominal_graph = self.env.reset(graph_key)
         self.key = key
 
-    def create_graph(self, jackal_state) -> GraphsTuple:
-        goal = self.nominal_graph.type_states(type_idx=1, n_type=1)
+    def create_graph(self, jackal_state, goal_pos) -> GraphsTuple:
+        # goal = self.nominal_graph.type_states(type_idx=1, n_type=1)
+        goal = jnp.zeros_like(jackal_state)
+        goal = goal.at[:, :2].set(goal_pos)
         env_state = LidarEnvState(jackal_state, goal, None)  # currently no obstacles
         return self.env.get_graph(env_state)
 

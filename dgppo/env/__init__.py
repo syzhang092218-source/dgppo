@@ -4,7 +4,7 @@ from .base import MultiAgentEnv
 # from dgppo.env.mpe import MPETarget, MPESpread, MPELine, MPEFormation, MPECorridor, MPEConnectSpread
 # from dgppo.env.lidar_env import LidarSpread, LidarTarget, LidarLine, LidarBicycleTarget, LidarDubinsCircle
 # from dgppo.env.vmas import VMASWheel, VMASReverseTransport
-from dgppo.env.lidar_env import LidarDubinsCircle
+from dgppo.env.lidar_env import LidarDubinsCircle, LidarDubinsTarget
 
 
 ENV = {
@@ -19,6 +19,7 @@ ENV = {
     # 'LidarTarget': LidarTarget,
     # 'LidarLine': LidarLine,
     'LidarDubinsCircle': LidarDubinsCircle,
+    'LidarDubinsTarget': LidarDubinsTarget,
     # 'LidarBicycleTarget': LidarBicycleTarget,
     # 'VMASReverseTransport': VMASReverseTransport,
     # 'VMASWheel': VMASWheel,

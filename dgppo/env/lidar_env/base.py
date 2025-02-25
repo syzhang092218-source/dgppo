@@ -12,7 +12,7 @@ from jaxtyping import Float
 from ...trainer.data import Rollout
 from ...utils.graph import EdgeBlock, GetGraph, GraphsTuple
 from ...utils.typing import Action, Array, Cost, Done, Info, Pos2d, Reward, State, AgentState
-from ...utils.utils import merge01, jax_vmap
+from ...utils.utils import merge01, jax_vmap, tree_index
 from ..base import MultiAgentEnv
 from dgppo.env.obstacle import Obstacle, Rectangle
 from dgppo.env.plot import render_lidar
@@ -279,3 +279,58 @@ class LidarEnv(MultiAgentEnv, ABC):
         lower_lim = jnp.ones(2) * -1.0
         upper_lim = jnp.ones(2)
         return lower_lim, upper_lim
+
+    def get_render_data(self, rollout: Rollout, Ta_is_unsafe: Array = None) -> Tuple[dict, dict]:
+        n_hits = self._params["top_k_rays"] * self.num_agents if self.params["n_obs"] > 0 else 0
+        graph0 = tree_index(rollout.graph, 0)
+        goal_pos = graph0.type_states(type_idx=1, n_type=self.num_goals)[:, :2]
+
+        T_agent_pos = []
+        T_edge_index = []
+        T_edge_node_pos = []
+        T_edge_colors = []
+        for kk in range(rollout.actions.shape[0]):
+            graph_t = tree_index(rollout.graph, kk)
+
+            # get positions of nodes
+            T_agent_pos.append(graph_t.type_states(type_idx=0, n_type=self.num_agents)[:, :2])
+
+            # get edge index
+            e_edge_index_t = np.stack([graph_t.senders, graph_t.receivers], axis=0)
+            is_pad_t = np.any(e_edge_index_t == self.num_agents + self.num_goals + n_hits, axis=0)
+            e_edge_index_t = e_edge_index_t[:, ~is_pad_t]
+            T_edge_index.append(e_edge_index_t)
+
+            # get positions of nodes in edges
+            T_edge_node_pos.append(graph_t.states[:, :2])
+
+            # get edge colors
+            e_is_goal_t = (self.num_agents <= graph_t.senders) & (graph_t.senders < self.num_agents + self.num_goals)
+            e_is_goal_t = e_is_goal_t[~is_pad_t]
+            e_colors_t = ["#2fdd00" if e_is_goal_t[ii] else "0.2" for ii in range(e_edge_index_t.shape[1])]
+            T_edge_colors.append(e_colors_t)
+
+        settings = {
+            "n_static_node": self.num_goals,
+            "n_moving_node": self.num_agents,
+            "static_node_r": [self.params["car_radius"]] * self.num_goals,
+            "static_node_color": ["#2fdd00"] * self.num_goals,
+            "static_node_labels": [None] * self.num_goals,
+            "moving_node_r": [self.params["car_radius"]] * self.num_agents,
+            "moving_node_color": ["#0068ff"] * self.num_agents,
+            "moving_node_labels": [f"{i}" for i in range(self.num_agents)],
+            "cost_components": self.cost_components,
+            "obstacle_color": "#8a0000"
+        }
+        T_data = {
+            "static_node_pos": goal_pos,
+            "T_moving_node_pos": T_agent_pos,
+            "Ta_is_unsafe": Ta_is_unsafe,
+            "T_costs": rollout.costs,
+            "T_rewards": rollout.rewards,
+            "T_edge_index": T_edge_index,
+            "T_edge_node_pos": T_edge_node_pos,
+            "T_edge_colors": T_edge_colors,
+            "static_obstacles": graph0.env_states.obstacle
+        }
+        return settings, T_data

@@ -22,7 +22,7 @@ class JackalMover:
         self.odom_sub = rospy.Subscriber('/sparkal1/odom', Odometry, self.odom_callback)
 
         # Publisher of the current orientation
-        self.orientation_pub = rospy.Publisher('/sparkal1/jackal_orientation', float, queue_size=10)
+        # self.orientation_pub = rospy.Publisher('/sparkal1/jackal_orientation', float, queue_size=10)
 
         # Initialize robot state
         self.position = [0.0, 0.0]  # (x, y)
@@ -34,7 +34,11 @@ class JackalMover:
         self.rate = rospy.Rate(int(1 / self.dt))  # Control loop at 10 Hz
 
         # Create control policy
-        self.policy = Policy(path, key)
+        policy_key, goal_key, self.key = jr.split(key, 3)
+        self.policy = Policy(path, policy_key)
+
+        # Create goal
+        self.init_graph = self.policy.env.reset(goal_key)
 
     def odom_callback(self, msg):
         # Extract position
@@ -65,14 +69,19 @@ class JackalMover:
 
     def run(self):
         while not rospy.is_shutdown():
-            # Get graph
+            # Get goal position
+            goal_pos = self.init_graph.type_states(type_idx=1, n_type=1)[:, :2]
+
+            # Get Jackal state
             jackal_state = jnp.array([0., 0., 0., 0., 0.])
             jackal_state = jackal_state.at[0].set(self.position[0])
             jackal_state = jackal_state.at[1].set(self.position[1])
             jackal_state = jackal_state.at[2].set(jnp.cos(self.orientation))
             jackal_state = jackal_state.at[3].set(jnp.sin(self.orientation))
             jackal_state = jackal_state.at[4].set(self.velocity[0])
-            graph = self.policy.create_graph(jackal_state[None])
+
+            # Get graph
+            graph = self.policy.create_graph(jackal_state[None], goal_pos)
 
             # Compute velocity command using get_control()
             action = self.policy.get_action(graph)
@@ -80,14 +89,21 @@ class JackalMover:
 
             # Publish velocity command
             self.vel_pub.publish(cmd_vel)
-            self.orientation_pub.publish(self.orientation)
+            # self.orientation_pub.publish(self.orientation)
+
+            # See if reach
+            dist2goal = jnp.linalg.norm(goal_pos - jackal_state[:2])
+            if dist2goal < 0.1:
+                # Get a new goal
+                goal_key, self.key = jr.split(self.key)
+                self.init_graph = self.policy.env.reset(goal_key)
 
             # Maintain loop rate
             self.rate.sleep()
 
 
 if __name__ == '__main__':
-    path = "./model/seed0_224120748_ZGJD"
+    path = "./model/goal_reaching"
 
     with ipdb.launch_ipdb_on_exception():
         try:
