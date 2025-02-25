@@ -53,6 +53,7 @@ class JackalMover:
 
         # Recode odometry offset
         self.odom_offset = [0.0, 0.0]
+        self.orientation_offset = 0.0
 
     def odom_callback(self, msg):
         # Extract position
@@ -84,6 +85,7 @@ class JackalMover:
     def run(self):
         # Calibration
         self.odom_offset = self.position
+        self.orientation_offset = self.orientation
 
         while not rospy.is_shutdown():
             # Get goal position
@@ -94,8 +96,8 @@ class JackalMover:
             jackal_state = jnp.array([0., 0., 0., 0., 0.])
             jackal_state = jackal_state.at[0].set(self.position[0] - self.odom_offset[0])
             jackal_state = jackal_state.at[1].set(self.position[1] - self.odom_offset[1])
-            jackal_state = jackal_state.at[2].set(jnp.cos(self.orientation))
-            jackal_state = jackal_state.at[3].set(jnp.sin(self.orientation))
+            jackal_state = jackal_state.at[2].set(jnp.cos(self.orientation - self.orientation_offset))
+            jackal_state = jackal_state.at[3].set(jnp.sin(self.orientation - self.orientation_offset))
             jackal_state = jackal_state.at[4].set(self.velocity[0])
 
             # Publish position
@@ -106,7 +108,7 @@ class JackalMover:
             odom_msg.pose.pose.orientation.x = 0.0
             odom_msg.pose.pose.orientation.y = 0.0
             odom_msg.pose.pose.orientation.z = 0.0
-            odom_msg.pose.pose.orientation.w = 1.0
+            odom_msg.pose.pose.orientation.w = self.orientation - self.orientation_offset
             self.position_pub.publish(odom_msg)
 
             # Get graph
