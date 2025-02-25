@@ -47,6 +47,9 @@ class JackalMover:
         self.goal_id = 0
         # self.init_graph = self.policy.env.reset(goal_key)
 
+        # Recode odometry offset
+        self.odom_offset = [0.0, 0.0]
+
     def odom_callback(self, msg):
         # Extract position
         x = msg.pose.pose.position.x
@@ -75,6 +78,9 @@ class JackalMover:
         return cmd_vel
 
     def run(self):
+        # Calibration
+        self.odom_offset = self.position
+
         while not rospy.is_shutdown():
             # Get goal position
             # goal_pos = self.init_graph.type_states(type_idx=1, n_type=1)[:, :2]
@@ -82,8 +88,8 @@ class JackalMover:
 
             # Get Jackal state
             jackal_state = jnp.array([0., 0., 0., 0., 0.])
-            jackal_state = jackal_state.at[0].set(self.position[0])
-            jackal_state = jackal_state.at[1].set(self.position[1])
+            jackal_state = jackal_state.at[0].set(self.position[0] - self.odom_offset[0])
+            jackal_state = jackal_state.at[1].set(self.position[1] - self.odom_offset[1])
             jackal_state = jackal_state.at[2].set(jnp.cos(self.orientation))
             jackal_state = jackal_state.at[3].set(jnp.sin(self.orientation))
             jackal_state = jackal_state.at[4].set(self.velocity[0])
