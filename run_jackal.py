@@ -100,8 +100,8 @@ class JackalMover:
 
             # Publish position
             odom_msg = Odometry()
-            odom_msg.pose.pose.position.x = self.position[0]
-            odom_msg.pose.pose.position.y = self.position[1]
+            odom_msg.pose.pose.position.x = jackal_state[0]
+            odom_msg.pose.pose.position.y = jackal_state[1]
             odom_msg.pose.pose.position.z = 0.0
             odom_msg.pose.pose.orientation.x = 0.0
             odom_msg.pose.pose.orientation.y = 0.0
