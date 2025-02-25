@@ -30,8 +30,8 @@ class JackalMover:
         self.velocity = [0.0, 0.0]  # (linear x, angular z)
 
         # Control rate
-        self.dt = 0.03
-        self.rate = rospy.Rate(int(1 / self.dt))  # Control loop at 10 Hz
+        self.dt = 0.02
+        self.rate = rospy.Rate(int(1 / self.dt))
 
         # Create control policy
         policy_key, goal_key, self.key = jr.split(key, 3)
