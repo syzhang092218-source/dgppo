@@ -22,6 +22,7 @@ class Policy:
     ):
         # params
         self.acc_scale = 5.
+        self.omega_scale = 0.5
         self.dt = 0.03
 
         self.path = path

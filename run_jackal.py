@@ -120,7 +120,7 @@ class JackalMover:
 
 
 if __name__ == '__main__':
-    path = "./model/goal_reaching"
+    path = "./model/goal_reaching2"
 
     with ipdb.launch_ipdb_on_exception():
         try:

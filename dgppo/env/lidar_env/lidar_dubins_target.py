@@ -98,7 +98,7 @@ class LidarDubinsTarget(LidarTarget):
 
         def single_agent_step(x, u):
             theta = jnp.arctan2(x[3], x[2])
-            theta_next = theta + u[0] * self.dt
+            theta_next = theta + u[0] * 0.5 * self.dt
             x_next = jnp.array([
                 x[0] + x[4] * jnp.cos(theta) * self.dt,
                 x[1] + x[4] * jnp.sin(theta) * self.dt,
