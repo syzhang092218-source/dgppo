@@ -5,6 +5,7 @@ import jax.numpy as jnp
 
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
+from std_msgs.msg import Float32
 from tf.transformations import euler_from_quaternion
 
 from jackal_control.policy import Policy
@@ -23,6 +24,9 @@ class JackalMover:
 
         # Publisher of the current orientation
         # self.orientation_pub = rospy.Publisher('/sparkal1/jackal_orientation', float, queue_size=10)
+
+        # Publisher of the current position
+        self.position_pub = rospy.Publisher('/sparkal2/jackal_position', Odometry, queue_size=10)
 
         # Initialize robot state
         self.position = [0.0, 0.0]  # (x, y)
@@ -93,6 +97,17 @@ class JackalMover:
             jackal_state = jackal_state.at[2].set(jnp.cos(self.orientation))
             jackal_state = jackal_state.at[3].set(jnp.sin(self.orientation))
             jackal_state = jackal_state.at[4].set(self.velocity[0])
+
+            # Publish position
+            odom_msg = Odometry()
+            odom_msg.pose.pose.position.x = self.position[0]
+            odom_msg.pose.pose.position.y = self.position[1]
+            odom_msg.pose.pose.position.z = 0.0
+            odom_msg.pose.pose.orientation.x = 0.0
+            odom_msg.pose.pose.orientation.y = 0.0
+            odom_msg.pose.pose.orientation.z = 0.0
+            odom_msg.pose.pose.orientation.w = 1.0
+            self.position_pub.publish(odom_msg)
 
             # Get graph
             graph = self.policy.create_graph(jackal_state[None], goal_pos)
