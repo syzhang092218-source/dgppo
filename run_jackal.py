@@ -69,7 +69,7 @@ class JackalMover:
         roll, pitch, yaw = euler_from_quaternion(quaternion)
 
         self.position = [x, y]
-        self.orientation = jnp.atan2(jnp.sin(yaw), jnp.cos(yaw))
+        self.orientation = jnp.arctan2(jnp.sin(yaw), jnp.cos(yaw))
 
         self.velocity = [
             msg.twist.twist.linear.x,
