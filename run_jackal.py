@@ -112,8 +112,9 @@ class JackalMover:
                 # Get a new goal
                 # goal_key, self.key = jr.split(self.key)
                 # self.init_graph = self.policy.env.reset(goal_key)
+                self.odom_offset = [self.position[0] - self.goals[self.goal_id % 4][0],
+                                    self.position[1] - self.goals[self.goal_id % 4][1]]
                 self.goal_id += 1
-                self.odom_offset = [self.position[0] - goal_pos[0], self.position[1] - goal_pos[1]]
 
             # Maintain loop rate
             self.rate.sleep()
