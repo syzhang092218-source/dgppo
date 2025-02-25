@@ -43,9 +43,9 @@ class JackalMover:
 
         # Create goal
         self.goals = jnp.array([
-            [2., 0],
-            [2., 2.],
-            [0, 2.],
+            [1.5, 0],
+            [1.5, 1.5],
+            [0, 1.5],
             [0, 0],
         ])
         self.goal_id = 0
