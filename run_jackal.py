@@ -85,7 +85,7 @@ class JackalMover:
     def run(self):
         # Calibration
         self.odom_offset = self.position
-        self.orientation_offset = self.orientation
+        self.orientation_offset = self.orientation + jnp.pi
 
         while not rospy.is_shutdown():
             # Get goal position
