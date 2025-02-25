@@ -108,6 +108,7 @@ class JackalMover:
             # See if reach
             dist2goal = jnp.linalg.norm(goal_pos - jackal_state[:2])
             if dist2goal < 0.1:
+                print(f'Goal {self.goal_id} reached!')
                 # Get a new goal
                 # goal_key, self.key = jr.split(self.key)
                 # self.init_graph = self.policy.env.reset(goal_key)
