@@ -98,7 +98,7 @@ class LidarDubinsTarget(LidarTarget):
 
         def single_agent_step(x, u):
             theta = jnp.arctan2(x[3], x[2])
-            theta_next = theta + u[0] * 0.5 * self.dt
+            theta_next = theta + u[0] * 0.3 * self.dt
             x_next = jnp.array([
                 x[0] + x[4] * jnp.cos(theta) * self.dt,
                 x[1] + x[4] * jnp.sin(theta) * self.dt,
@@ -121,7 +121,7 @@ class LidarDubinsTarget(LidarTarget):
         return feat
 
     def state_lim(self, state: Optional[State] = None) -> Tuple[State, State]:
-        lower_lim = jnp.array([0., 0., -1, -1, -0.1])
+        lower_lim = jnp.array([0., 0., -1, -1, -0.05])
         upper_lim = jnp.array([self.area_size, self.area_size, 1, 1, 0.5])
         return lower_lim, upper_lim
 
