@@ -20,7 +20,8 @@ class JackalMover:
         self.vel_pub = rospy.Publisher('/sparkal2/jackal_velocity_controller/cmd_vel', Twist, queue_size=10)
 
         # Subscriber to get Jackal's odometry
-        self.odom_sub = rospy.Subscriber('/sparkal2/odom', Odometry, self.odom_callback)
+        # self.odom_sub = rospy.Subscriber('/sparkal2/odom', Odometry, self.odom_callback)
+        self.odom_sub = rospy.Subscriber('/camera/odom/sample', Odometry, self.odom_callback)
 
         # Publisher of the current orientation
         # self.orientation_pub = rospy.Publisher('/sparkal1/jackal_orientation', float, queue_size=10)
