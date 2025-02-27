@@ -26,7 +26,7 @@ ENV = {
 }
 
 
-DEFAULT_MAX_STEP = 256
+DEFAULT_MAX_STEP = 512
 
 
 def make_env(

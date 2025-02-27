@@ -8,6 +8,7 @@ from typing import Tuple
 
 from dgppo.env import make_env
 from dgppo.env.lidar_env.base import LidarEnvState
+from dgppo.env.lidar_env.lidar_dubins_target import LidarMoveObsEnvState
 from dgppo.algo import make_algo
 from dgppo.utils.graph import GraphsTuple
 from dgppo.utils.typing import Action
@@ -21,9 +22,9 @@ class Policy:
             key: jr.PRNGKey
     ):
         # params
-        self.acc_scale = 5.
-        self.omega_scale = 0.3
-        self.dt = 0.03
+        self.acc_scale = 10.
+        self.omega_scale = 0.4
+        self.dt = 0.02
 
         self.path = path
 
@@ -77,11 +78,13 @@ class Policy:
         self.nominal_graph = self.env.reset(graph_key)
         self.key = key
 
-    def create_graph(self, jackal_state, goal_pos) -> GraphsTuple:
+    def create_graph(self, jackal_state, goal_pos, human_pos) -> GraphsTuple:
         # goal = self.nominal_graph.type_states(type_idx=1, n_type=1)
         goal = jnp.zeros_like(jackal_state)
         goal = goal.at[:, :2].set(goal_pos)
-        env_state = LidarEnvState(jackal_state, goal, None)  # currently no obstacles
+        human_pos = jnp.zeros_like(jackal_state)
+        human_pos = human_pos.at[:, :2].set(human_pos)
+        env_state = LidarMoveObsEnvState(jackal_state, goal, None, human_pos)  # currently no obstacles
         return self.env.get_graph(env_state)
 
     def get_action(self, graph: GraphsTuple) -> Tuple[float, float]:

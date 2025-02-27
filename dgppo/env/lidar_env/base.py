@@ -197,7 +197,7 @@ class LidarEnv(MultiAgentEnv, ABC):
             obs_cost: Array = self.params["car_radius"] - dist.min(axis=1)  # (n_agent,)
 
         cost = jnp.concatenate([agent_cost[:, None], obs_cost[:, None]], axis=1)
-        assert cost.shape == (self.num_agents, self.n_cost)
+        # assert cost.shape == (self.num_agents, self.n_cost)
 
         # add margin
         eps = 0.5

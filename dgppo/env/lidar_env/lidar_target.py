@@ -93,5 +93,6 @@ class LidarTarget(LidarEnv):
                     EdgeBlock(lidar_feats[None, :, :], agent_obs_mask, id_agent[i][None], id_obs[id_hits])
                 )
 
-        return [agent_agent_edges] + agent_goal_edges + agent_obs_edges
+        return agent_goal_edges + agent_obs_edges
+        # return [agent_agent_edges] + agent_goal_edges + agent_obs_edges
 

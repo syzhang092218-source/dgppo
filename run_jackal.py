@@ -3,7 +3,7 @@ import rospy
 import jax.random as jr
 import jax.numpy as jnp
 
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, Point
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Float32
 from tf.transformations import euler_from_quaternion
@@ -26,13 +26,22 @@ class JackalMover:
         # Publisher of the current orientation
         # self.orientation_pub = rospy.Publisher('/sparkal1/jackal_orientation', float, queue_size=10)
 
+        # Subscriber to get human's position
+        self.human_pos_sub = rospy.Subscriber('/humanpose/center', Point, self.human_pos_callback)
+
         # Publisher of the current position
         self.position_pub = rospy.Publisher('/sparkal2/jackal_position', Odometry, queue_size=10)
+
+        # Publisher of the current human position
+        self.human_pos_pub = rospy.Publisher('/sparkal2/human_position', Point, queue_size=10)
 
         # Initialize robot state
         self.position = [0.0, 0.0]  # (x, y)
         self.orientation = 0.0  # Yaw (in radians)
         self.velocity = [0.0, 0.0]  # (linear x, angular z)
+
+        # Initialize human pos
+        self.human_pos = [0.0, 0.0]  # (x, y)
 
         # Control rate
         self.dt = 0.02
@@ -95,6 +104,14 @@ class JackalMover:
             msg.twist.twist.angular.z,
         ]
 
+    def human_pos_callback(self, msg):
+        pos_rel = jnp.array([msg.x, msg.y])
+        rot_mat = jnp.array([
+            [jnp.sin(self.orientation), jnp.cos(self.orientation)],
+            [-jnp.cos(self.orientation), jnp.sin(self.orientation)],
+        ])
+        self.human_pos = jnp.dot(rot_mat, pos_rel) + jnp.array(self.position)
+
     def action2cmd_vel(self, omega, v) -> Twist:
         cmd_vel = Twist()
         cmd_vel.linear.x = v
@@ -130,8 +147,20 @@ class JackalMover:
             odom_msg.pose.pose.orientation.w = self.orientation
             self.position_pub.publish(odom_msg)
 
+            # Get human pos
+            human_pos = jnp.array([0., 0., 0., 0., 0.])
+            human_pos = human_pos.at[0].set(self.human_pos[0])
+            human_pos = human_pos.at[1].set(self.human_pos[1])
+
+            # Publish human position
+            human_pos_msg = Point()
+            human_pos_msg.x = human_pos[0]
+            human_pos_msg.y = human_pos[1]
+            human_pos_msg.z = 0.0
+            self.human_pos_pub.publish(human_pos_msg)
+
             # Get graph
-            graph = self.policy.create_graph(jackal_state[None], goal_pos)
+            graph = self.policy.create_graph(jackal_state[None], goal_pos, human_pos)
 
             # Compute velocity command using get_control()
             action = self.policy.get_action(graph)
@@ -144,7 +173,7 @@ class JackalMover:
             # See if reach
             dist2goal = jnp.linalg.norm(goal_pos - jackal_state[:2])
             if dist2goal < 0.1:
-                print(f'Goal {self.goal_id} reached!')
+                print(f'Goal {self.goal_id % 4} reached!')
                 # Get a new goal
                 # goal_key, self.key = jr.split(self.key)
                 # self.init_graph = self.policy.env.reset(goal_key)
@@ -157,7 +186,7 @@ class JackalMover:
 
 
 if __name__ == '__main__':
-    path = "./model/goal_reaching2"
+    path = "./model/reach_avoid"
 
     with ipdb.launch_ipdb_on_exception():
         try:
