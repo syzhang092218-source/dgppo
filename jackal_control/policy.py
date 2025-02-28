@@ -35,7 +35,7 @@ class Policy:
         # make env
         self.env = make_env(
             env_id=config.env,
-            num_agents=config.num_agents,
+            num_agents=1,
             num_obs=config.obs,
         )
         self.state_lim = self.env.state_lim
@@ -82,9 +82,9 @@ class Policy:
         # goal = self.nominal_graph.type_states(type_idx=1, n_type=1)
         goal = jnp.zeros_like(jackal_state)
         goal = goal.at[:, :2].set(goal_pos)
-        human_pos = jnp.zeros_like(jackal_state)
-        human_pos = human_pos.at[:, :2].set(human_pos)
-        env_state = LidarMoveObsEnvState(jackal_state, goal, None, human_pos)  # currently no obstacles
+        human_pos_state = jnp.zeros_like(jackal_state)
+        human_pos_state = human_pos_state.at[:, :2].set(human_pos)
+        env_state = LidarMoveObsEnvState(jackal_state, goal, None, human_pos_state)  # currently no obstacles
         return self.env.get_graph(env_state)
 
     def get_action(self, graph: GraphsTuple) -> Tuple[float, float]:
