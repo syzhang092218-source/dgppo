@@ -42,15 +42,15 @@ class LidarDubinsTarget(LidarTarget):
 
     PARAMS = {
         "car_radius": 0.3,
-        "comm_radius": 5,
+        "comm_radius": 10,
         "n_rays": 32,
-        "obs_angle": jnp.deg2rad(90),
+        "obs_angle": jnp.deg2rad(120),
         "obs_len_range": [0.1, 0.3],
         "n_obs": 0,
         "n_move_obs": 3,
         'move_obs_vel': 0.3,
         'move_obs_radius': 0.25,
-        "default_area_size": 4.0,
+        "default_area_size": 5.0,
         "dist2goal": 0.01,
         "top_k_rays": 8,
     }
