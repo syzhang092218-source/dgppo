@@ -51,13 +51,15 @@ class JackalMover:
         policy_key, goal_key, self.key = jr.split(key, 3)
         self.policy = Policy(path, policy_key)
 
+        self.pos2sim = [1.0, 1.0]
+
         # Create goal
         self.goals = jnp.array([
             [1.5, 0],
             [1.5, 1.5],
             [0, 1.5],
             [0, 0],
-        ])
+        ]) + jnp.array(self.pos2sim)
         self.goal_id = 0
         # self.init_graph = self.policy.env.reset(goal_key)
 
@@ -132,8 +134,8 @@ class JackalMover:
 
             # Get Jackal state
             jackal_state = jnp.array([0., 0., 0., 0., 0.])
-            jackal_state = jackal_state.at[0].set(self.position[0] - self.odom_offset[0])
-            jackal_state = jackal_state.at[1].set(self.position[1] - self.odom_offset[1])
+            jackal_state = jackal_state.at[0].set(self.position[0] - self.odom_offset[0] + self.pos2sim[0])
+            jackal_state = jackal_state.at[1].set(self.position[1] - self.odom_offset[1] + self.pos2sim[1])
             jackal_state = jackal_state.at[2].set(jnp.cos(self.orientation))
             jackal_state = jackal_state.at[3].set(jnp.sin(self.orientation))
             jackal_state = jackal_state.at[4].set(self.velocity[0])
