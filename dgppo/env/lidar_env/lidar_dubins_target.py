@@ -47,7 +47,7 @@ class LidarDubinsTarget(LidarTarget):
         "obs_angle": jnp.deg2rad(120),
         "obs_len_range": [0.1, 0.3],
         "n_obs": 0,
-        "n_move_obs": 3,
+        "n_move_obs": 1,
         'move_obs_vel': 0.3,
         'move_obs_radius': 0.25,
         "default_area_size": 5.0,

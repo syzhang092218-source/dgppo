@@ -41,7 +41,7 @@ class JackalMover:
         self.velocity = [0.0, 0.0]  # (linear x, angular z)
 
         # Initialize human pos
-        self.human_pos = [0.0, 0.0]  # (x, y)
+        self.human_pos = [-100, -100.]  # (x, y)
 
         # Control rate
         self.dt = 0.02
@@ -111,6 +111,7 @@ class JackalMover:
             [-jnp.cos(self.orientation), jnp.sin(self.orientation)],
         ])
         self.human_pos = jnp.dot(rot_mat, pos_rel) + jnp.array(self.position)
+        # self.human_pos = [-100., -100.]
 
     def action2cmd_vel(self, omega, v) -> Twist:
         cmd_vel = Twist()
@@ -121,6 +122,7 @@ class JackalMover:
     def run(self):
         # Calibration
         self.odom_offset = self.position
+        print("Odom offset: ", self.odom_offset)
         self.orientation_offset = self.orientation + jnp.pi
 
         while not rospy.is_shutdown():
@@ -148,14 +150,14 @@ class JackalMover:
             self.position_pub.publish(odom_msg)
 
             # Get human pos
-            human_pos = jnp.array([0., 0., 0., 0., 0.])
-            human_pos = human_pos.at[0].set(self.human_pos[0])
-            human_pos = human_pos.at[1].set(self.human_pos[1])
+            human_pos = jnp.array([0., 0.])
+            human_pos = human_pos.at[0].set(self.human_pos[0] - self.odom_offset[0])
+            human_pos = human_pos.at[1].set(self.human_pos[1] - self.odom_offset[1])
 
             # Publish human position
             human_pos_msg = Point()
-            human_pos_msg.x = human_pos[0]
-            human_pos_msg.y = human_pos[1]
+            human_pos_msg.x = human_pos[0] - self.odom_offset[0]
+            human_pos_msg.y = human_pos[1] - self.odom_offset[1]
             human_pos_msg.z = 0.0
             self.human_pos_pub.publish(human_pos_msg)
 
@@ -172,7 +174,7 @@ class JackalMover:
 
             # See if reach
             dist2goal = jnp.linalg.norm(goal_pos - jackal_state[:2])
-            if dist2goal < 0.1:
+            if dist2goal < 0.3:
                 print(f'Goal {self.goal_id % 4} reached!')
                 # Get a new goal
                 # goal_key, self.key = jr.split(self.key)
