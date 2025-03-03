@@ -82,7 +82,8 @@ class Policy:
         # goal = self.nominal_graph.type_states(type_idx=1, n_type=1)
         goal = jnp.zeros_like(jackal_state)
         goal = goal.at[:, :2].set(goal_pos)
-        human_pos_state = jnp.zeros_like(jackal_state)
+        # human_pos_state = jnp.zeros_like(jackal_state)
+        human_pos_state = jnp.zeros((human_pos.shape[0], 5))
         human_pos_state = human_pos_state.at[:, :2].set(human_pos)
         env_state = LidarMoveObsEnvState(jackal_state, goal, None, human_pos_state)  # currently no obstacles
         return self.env.get_graph(env_state)

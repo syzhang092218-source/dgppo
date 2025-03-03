@@ -27,7 +27,15 @@ class JackalMover:
         # self.orientation_pub = rospy.Publisher('/sparkal1/jackal_orientation', float, queue_size=10)
 
         # Subscriber to get human's position
-        self.human_pos_sub = rospy.Subscriber('/humanpose/center', Point, self.human_pos_callback)
+        # self.human_pos_sub = rospy.Subscriber('/humanpose/center', Point, self.human_pos_callback)
+
+        # Subscriber to get multiple human's position
+        self.human_pos_sub_0 = rospy.Subscriber('/humanpose/center_0', Point, self.human_pos_callback_0)
+        self.human_pos_sub_1 = rospy.Subscriber('/humanpose/center_1', Point, self.human_pos_callback_1)
+
+        #  Publisher of the current human's position
+        self.human_pos_pub_0 = rospy.Publisher('/sparkal2/human_position_0', Point, queue_size=10)
+        self.human_pos_pub_1 = rospy.Publisher('/sparkal2/human_position_1', Point, queue_size=10)
 
         # Publisher of the current position
         self.position_pub = rospy.Publisher('/sparkal2/jackal_position', Odometry, queue_size=10)
@@ -41,7 +49,9 @@ class JackalMover:
         self.velocity = [0.0, 0.0]  # (linear x, angular z)
 
         # Initialize human pos
-        self.human_pos = [-100, -100.]  # (x, y)
+        # self.human_pos = [-100, -100.]  # (x, y)
+        self.human_pos_0 = [-100, -100.]  # (x, y)
+        self.human_pos_1 = [-100, -100.]  # (x, y)
 
         # Control rate
         self.dt = 0.02
@@ -51,13 +61,19 @@ class JackalMover:
         policy_key, goal_key, self.key = jr.split(key, 3)
         self.policy = Policy(path, policy_key)
 
-        self.pos2sim = [1.0, 1.0]
+        self.pos2sim = [0., 0.]
 
         # Create goal
+        # self.goals = jnp.array([
+        #     [0, 1.5],
+        #     [3., 1.5],
+        #     [3., 0],
+        #     [0, 0],
+        # ]) + jnp.array(self.pos2sim)
         self.goals = jnp.array([
-            [1.5, 0],
-            [1.5, 1.5],
-            [0, 1.5],
+            [2.5, 0],
+            [2.5, 2.5],
+            [0, 2.5],
             [0, 0],
         ]) + jnp.array(self.pos2sim)
         self.goal_id = 0
@@ -106,14 +122,29 @@ class JackalMover:
             msg.twist.twist.angular.z,
         ]
 
-    def human_pos_callback(self, msg):
+    # def human_pos_callback(self, msg):
+    #     pos_rel = jnp.array([msg.x, msg.y])
+    #     rot_mat = jnp.array([
+    #         [jnp.sin(self.orientation), jnp.cos(self.orientation)],
+    #         [-jnp.cos(self.orientation), jnp.sin(self.orientation)],
+    #     ])
+    #     self.human_pos = jnp.dot(rot_mat, pos_rel) + jnp.array(self.position)
+
+    def human_pos_callback_0(self, msg):
         pos_rel = jnp.array([msg.x, msg.y])
         rot_mat = jnp.array([
             [jnp.sin(self.orientation), jnp.cos(self.orientation)],
             [-jnp.cos(self.orientation), jnp.sin(self.orientation)],
         ])
-        self.human_pos = jnp.dot(rot_mat, pos_rel) + jnp.array(self.position)
-        # self.human_pos = [-100., -100.]
+        self.human_pos_0 = jnp.dot(rot_mat, pos_rel) + jnp.array(self.position)
+
+    def human_pos_callback_1(self, msg):
+        pos_rel = jnp.array([msg.x, msg.y])
+        rot_mat = jnp.array([
+            [jnp.sin(self.orientation), jnp.cos(self.orientation)],
+            [-jnp.cos(self.orientation), jnp.sin(self.orientation)],
+        ])
+        self.human_pos_1 = jnp.dot(rot_mat, pos_rel) + jnp.array(self.position)
 
     def action2cmd_vel(self, omega, v) -> Twist:
         cmd_vel = Twist()
@@ -151,17 +182,38 @@ class JackalMover:
             odom_msg.pose.pose.orientation.w = self.orientation
             self.position_pub.publish(odom_msg)
 
+            # # Get human pos
+            # human_pos = jnp.array([0., 0.])
+            # human_pos = human_pos.at[0].set(self.human_pos[0] - self.odom_offset[0] + self.pos2sim[0])
+            # human_pos = human_pos.at[1].set(self.human_pos[1] - self.odom_offset[1] + self.pos2sim[1])
+            #
+            # # Publish human position
+            # human_pos_msg = Point()
+            # human_pos_msg.x = human_pos[0] - jackal_state[0]
+            # human_pos_msg.y = human_pos[1] - jackal_state[1]
+            # human_pos_msg.z = 0.0
+            # self.human_pos_pub.publish(human_pos_msg)
+
             # Get human pos
-            human_pos = jnp.array([0., 0.])
-            human_pos = human_pos.at[0].set(self.human_pos[0] - self.odom_offset[0])
-            human_pos = human_pos.at[1].set(self.human_pos[1] - self.odom_offset[1])
+            human_pos_0 = jnp.array([0., 0.])
+            human_pos_0 = human_pos_0.at[0].set(self.human_pos_0[0] - self.odom_offset[0] + self.pos2sim[0])
+            human_pos_0 = human_pos_0.at[1].set(self.human_pos_0[1] - self.odom_offset[1] + self.pos2sim[1])
+            human_pos_1 = jnp.array([0., 0.])
+            human_pos_1 = human_pos_1.at[0].set(self.human_pos_1[0] - self.odom_offset[0] + self.pos2sim[0])
+            human_pos_1 = human_pos_1.at[1].set(self.human_pos_1[1] - self.odom_offset[1] + self.pos2sim[1])
+            human_pos = jnp.concatenate([human_pos_0[None], human_pos_1[None]], axis=0)
 
             # Publish human position
-            human_pos_msg = Point()
-            human_pos_msg.x = human_pos[0] - self.odom_offset[0]
-            human_pos_msg.y = human_pos[1] - self.odom_offset[1]
-            human_pos_msg.z = 0.0
-            self.human_pos_pub.publish(human_pos_msg)
+            human_pos_msg_0 = Point()
+            human_pos_msg_0.x = human_pos_0[0] - jackal_state[0]
+            human_pos_msg_0.y = human_pos_0[1] - jackal_state[1]
+            human_pos_msg_0.z = 0.0
+            self.human_pos_pub_0.publish(human_pos_msg_0)
+            human_pos_msg_1 = Point()
+            human_pos_msg_1.x = human_pos_1[0] - jackal_state[0]
+            human_pos_msg_1.y = human_pos_1[1] - jackal_state[1]
+            human_pos_msg_1.z = 0.0
+            self.human_pos_pub_1.publish(human_pos_msg_1)
 
             # Get graph
             graph = self.policy.create_graph(jackal_state[None], goal_pos, human_pos)
