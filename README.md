@@ -217,7 +217,7 @@ This should report the reward, min/max reward, cost, min/max cost, and the safet
 
 ```
 @inproceedings{zhang2025dgppo,
-      title={Discrete GCBF Proximal Policy Optimization for Multi-agent Safe Optimal Control},
+      title={Discrete {GCBF} Proximal Policy Optimization for Multi-agent Safe Optimal Control},
       author={Zhang, Songyuan and So, Oswin and Black, Mitchell and Fan, Chuchu},
       booktitle={The Thirteenth International Conference on Learning Representations},
       year={2025},
