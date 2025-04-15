@@ -113,7 +113,7 @@ We provide the following environments with the [VMAS](https://github.com/prorokl
 - `VMASWheel`: The agents need to push a wheel to its pre-assigned angle, while the wheel must avoid a range of dangerous angles.
 
 ### Custom Environments
-It is very easy to create a custom environment by yourself! Choose one of the three engines, and inherit one of the existing environments. Define your reward function, graph connection, and dynamics, register the new environment in `env/\_\_init\_\_.py`, and you are good to go!
+It is very easy to create a custom environment by yourself! Choose one of the three engines, and inherit one of the existing environments. Define your reward function, graph connection, and dynamics, register the new environment in `env/__init__.py`, and you are good to go!
 
 ## Algorithms
 
