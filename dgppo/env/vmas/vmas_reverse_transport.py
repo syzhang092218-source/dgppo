@@ -48,11 +48,10 @@ class VMASReverseTransport(MultiAgentEnv):
             params: dict = None
     ):
         half_width = 0.8
-        assert num_agents == 3, "VMASReverseTransport only supports 3 agents."
         area_size = 2 * half_width
         self.half_width = half_width
         self.agent_radius = 0.03
-        super().__init__(3, area_size, max_step, dt, params)
+        super().__init__(num_agents, area_size, max_step, dt, params)
 
         self.package_width = 0.6
         self.package_length = 0.6
@@ -369,7 +368,8 @@ class VMASReverseTransport(MultiAgentEnv):
         ax.add_patch(box_center)
 
         # Plot agent
-        agent_colors = ["C2", "C1", "C4"]
+        # agent_colors = ["C2", "C1", "C4"]
+        agent_colors = [f"C{i}" for i in range(self.num_agents)]
         agent_radius = self.agent_radius
         agent_patches = [
             plt.Circle((0, 0), agent_radius, color=agent_colors[ii], zorder=5) for ii in range(self.num_agents)
