@@ -145,7 +145,7 @@ The training logs will be saved in `logs/<env>/<algo>/seed<seed>_<timestamp>_<fo
 
 #### For algorithms
 
-- `--cbf-schedule`: [For dgppo and hcbfcrpo] Use the CBF schedule, default False (**This should be used to reproduce the results**).
+- `--no-cbf-schedule`: [For dgppo and hcbfcrpo] Remove the CBF schedule, default False.
 - `--cbf-weight`: [For dgppo and hcbrcrpo] Weight of the CBF loss, default 1.0.
 - `--cbf-eps`: [For dgppo and hcbrcrpo] Epsilon of the CBF loss, default 0.01.
 - `--alpha`: [For dgppo and hcbrcrpo] The class-$\kappa$ function, default 10.0.
